@@ -194,3 +194,48 @@ export const portfolioAnalysis = pgTable('portfolioAnalysis', {
   createdAt: timestamp('createdAt').notNull().defaultNow(),
   updatedAt: timestamp('updatedAt').notNull().defaultNow(),
 })
+
+export const notifications = pgTable('notifications', {
+  id: text('id').primaryKey(),
+  userId: text('userId').notNull(),
+  type: text('type').notNull(), // 'resume_analysis', 'job_match', 'skill_gap', 'milestone'
+  title: text('title').notNull(),
+  message: text('message').notNull(),
+  icon: text('icon'),
+  color: text('color'),
+  read: boolean('read').notNull().default(false),
+  actionUrl: text('actionUrl'),
+  actionLabel: text('actionLabel'),
+  metadata: jsonb('metadata').$type<any>().default({}),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+})
+
+export const userAnalytics = pgTable('userAnalytics', {
+  id: text('id').primaryKey(),
+  userId: text('userId').notNull().unique(),
+  totalResumeUploads: integer('totalResumeUploads').default(0),
+  totalProfileViews: integer('totalProfileViews').default(0),
+  averageResumeScore: numeric('averageResumeScore', { precision: 5, scale: 2 }).default(0),
+  careerGrowthScore: numeric('careerGrowthScore', { precision: 5, scale: 2 }).default(0),
+  jobMatchPercentage: numeric('jobMatchPercentage', { precision: 5, scale: 2 }).default(0),
+  skillGaps: jsonb('skillGaps').$type<string[]>().default([]),
+  topSkills: jsonb('topSkills').$type<string[]>().default([]),
+  activityLog: jsonb('activityLog').$type<any[]>().default([]),
+  lastUpdated: timestamp('lastUpdated').notNull().defaultNow(),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+})
+
+export const userSettings = pgTable('userSettings', {
+  id: text('id').primaryKey(),
+  userId: text('userId').notNull().unique(),
+  emailNotifications: boolean('emailNotifications').default(true),
+  careerTips: boolean('careerTips').default(true),
+  jobAlerts: boolean('jobAlerts').default(true),
+  weeklyDigest: boolean('weeklyDigest').default(false),
+  theme: text('theme').default('dark'), // 'light' | 'dark' | 'system'
+  language: text('language').default('en'),
+  privateProfile: boolean('privateProfile').default(true),
+  dataCollection: boolean('dataCollection').default(true),
+  createdAt: timestamp('createdAt').notNull().defaultNow(),
+  updatedAt: timestamp('updatedAt').notNull().defaultNow(),
+})
