@@ -30,15 +30,16 @@ export function LoginForm() {
         title: 'Welcome back!',
         message: 'You have been logged in successfully.',
       })
-      router.push('/dashboard')
+      // Small delay to let auth state update
+      setTimeout(() => router.push('/dashboard'), 500)
     } catch (error) {
+      setIsLoading(false)
+      const errorMessage = error instanceof Error ? error.message : 'Please check your credentials.'
       addNotification({
         type: 'error',
         title: 'Login failed',
-        message: error instanceof Error ? error.message : 'Please check your credentials.',
+        message: errorMessage,
       })
-    } finally {
-      setIsLoading(false)
     }
   }
 

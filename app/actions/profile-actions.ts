@@ -1,17 +1,10 @@
 'use server'
 
-import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { linkedinProfiles, linkedinAnalysis, githubProfiles, githubAnalysis, portfolioProjects, portfolioAnalysis } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
-import { headers } from 'next/headers'
+import { getUserId } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-
-async function getUserId() {
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) throw new Error('Unauthorized')
-  return session.user.id
-}
 
 // LinkedIn Actions
 export async function addLinkedInProfile(profileUrl: string, data: any) {

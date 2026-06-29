@@ -1,7 +1,7 @@
 'use server'
 
 import { emailService } from '@/lib/email/email-service'
-import { auth } from '@/lib/auth'
+import { getUserId, createClient } from '@/lib/supabase/server'
 import { db } from '@/lib/db'
 import { notifications, userSettings } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
@@ -17,13 +17,14 @@ export async function sendResumeAnalysisEmail(
   keyImprovements: string[]
 ) {
   try {
-    const session = await auth.api.getSession()
-    if (!session?.user) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
       throw new Error('Unauthorized')
     }
 
-    const userId = session.user.id
-    const userEmail = session.user.email
+    const userId = user.id
+    const userEmail = user.email
 
     if (!userEmail) {
       throw new Error('User email not found')

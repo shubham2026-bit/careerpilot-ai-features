@@ -1,17 +1,10 @@
 'use server'
 
-import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { resumes, resumeAnalysis } from '@/lib/db/schema'
-import { headers } from 'next/headers'
+import { getUserId } from '@/lib/supabase/server'
 import { eq, desc } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
-
-async function getUserId() {
-  const session = await auth.api.getSession({ headers: await headers() })
-  if (!session?.user) throw new Error('Unauthorized')
-  return session.user.id
-}
 
 // Parse resume text to extract structured data
 function parseResumeText(text: string) {

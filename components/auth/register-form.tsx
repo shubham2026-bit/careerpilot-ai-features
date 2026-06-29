@@ -42,15 +42,16 @@ export function RegisterForm() {
         title: 'Account created!',
         message: 'Your account has been created successfully.',
       })
-      router.push('/dashboard')
+      // Small delay to let auth state update
+      setTimeout(() => router.push('/dashboard'), 500)
     } catch (error) {
+      setIsLoading(false)
+      const errorMessage = error instanceof Error ? error.message : 'Please try again.'
       addNotification({
         type: 'error',
         title: 'Registration failed',
-        message: error instanceof Error ? error.message : 'Please try again.',
+        message: errorMessage,
       })
-    } finally {
-      setIsLoading(false)
     }
   }
 
