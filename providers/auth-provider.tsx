@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import type { User, AuthState } from '@/lib/types/auth'
-import { supabase, signIn as supabaseSignIn, signUp as supabaseSignUp, signOut as supabaseSignOut } from '@/lib/auth-client'
+import { getSupabaseClient, signIn as supabaseSignIn, signUp as supabaseSignUp, signOut as supabaseSignOut } from '@/lib/auth-client'
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>
@@ -24,6 +24,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkSession = async () => {
       try {
+        const supabase = getSupabaseClient()
+        if (!supabase) return
+        
         const { data: { session } } = await supabase.auth.getSession()
         
         if (session?.user) {
@@ -61,6 +64,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkSession()
 
     // Subscribe to auth changes
+    const supabase = getSupabaseClient()
+    if (!supabase) return
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (session?.user) {
