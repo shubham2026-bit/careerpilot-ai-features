@@ -1,5 +1,3 @@
-'use server'
-
 import React from 'react'
 import { Html, Body, Container, Head, Hr, Img, Link, Preview, Row, Section, Text } from '@react-email/components'
 
