@@ -10,7 +10,8 @@ import Link from 'next/link'
 
 export function Navbar() {
   const { user } = useAuth()
-  const { isDark, setTheme } = useTheme()
+  const themeContext = useTheme()
+  const { isDark, setTheme } = themeContext
 
   return (
     <nav className="sticky top-0 z-30 w-full bg-background/80 backdrop-blur-md border-b border-border">
