@@ -1,0 +1,70 @@
+========================================
+CAREERPLOT AI - SUPABASE SETUP QUICK REF
+========================================
+
+PROJECT DETAILS:
+- Supabase URL: https://chogupjjindroxqkdxjg.supabase.co
+- Database: PostgreSQL (12 tables)
+- Auth: Supabase Auth
+- Email: Resend
+
+========================================
+STEP 1: RUN SQL MIGRATION
+========================================
+
+1. Go to: https://app.supabase.com/project/chogupjjindroxqkdxjg
+2. Click: SQL Editor → New Query
+3. Copy all content from:
+   /vercel/share/v0-project/migrations/001_create_tables.sql
+4. Paste into SQL editor
+5. Click: RUN
+
+This creates all database tables.
+
+========================================
+STEP 2: VERIFY ENV VARIABLES
+========================================
+
+✓ DATABASE_URL=postgresql://postgres:CareerPilot@0001@db.chogupjjindroxqkdxjg.supabase.co:5432/postgres
+✓ RESEND_API_KEY=re_jEeaMzNs_NvEY94VeoZ6ZxYsxrWErQDry
+✓ NEXT_PUBLIC_SUPABASE_URL=https://chogupjjindroxqkdxjg.supabase.co
+✓ NEXT_PUBLIC_SUPABASE_ANON_KEY=[SET IN VERCEL]
+✓ SUPABASE_SERVICE_ROLE_KEY=[SET IN VERCEL]
+
+========================================
+STEP 3: TEST
+========================================
+
+1. Open app preview
+2. Sign up with email
+3. Should see dashboard
+4. Try logout/login
+5. All should work!
+
+========================================
+KEY FILES
+========================================
+
+migrations/001_create_tables.sql  - Database schema
+lib/auth-client.ts                - Auth setup
+providers/auth-provider.tsx       - Session management
+lib/supabase/server.ts            - Server operations
+
+========================================
+TROUBLESHOOTING
+========================================
+
+404 after login?
+→ Run SQL migration
+→ Clear cache
+→ Try again
+
+Unauthorized error?
+→ Check env variables
+→ Verify Supabase keys
+
+Email not sending?
+→ Verify RESEND_API_KEY
+→ Check spam folder
+
+========================================
