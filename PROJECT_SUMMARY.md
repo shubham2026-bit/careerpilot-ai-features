@@ -382,7 +382,68 @@ pnpm type-check
 pnpm lint
 ```
 
+## Phase 6: Email Notifications System
+
+### Email Infrastructure
+- Integrated Resend for production-grade email delivery
+- Three specialized email templates: Resume Analysis, Job Match, Weekly Digest
+- Generic notification system for custom emails
+- User preference-aware sending (respects notification settings)
+
+### Email Templates
+- **Resume Analysis Email**: Score, strengths, improvements, direct analysis link
+- **Job Match Email**: Job details, match percentage, why it's a fit
+- **Weekly Digest Email**: Resume score, job matches, career tips
+
+### Implementation
+- Email service utility (`lib/email/email-service.ts`) with 4 send methods
+- Server actions with automatic preference checking and notification creation
+- Seamless integration with existing notification and database systems
+- All emails include unsubscribe and preference links
+
+### Features
+- Automatic user preference validation before sending
+- Email + in-app notifications (dual notification system)
+- Error logging and exception handling
+- Support for custom generic notifications
+- Production-ready with test mode support
+
 ---
 
-**Built with ❤️ using Next.js 16, React 19, TypeScript, and Tailwind CSS**
+## Getting Started
+
+### Quick Setup
+
+1. **Install dependencies**
+   ```bash
+   pnpm install
+   ```
+
+2. **Setup environment** (see `.env.example`)
+   ```bash
+   RESEND_API_KEY=your_api_key
+   DATABASE_URL=your_neon_url
+   BETTER_AUTH_SECRET=your_secret
+   ```
+
+3. **Setup database**
+   ```bash
+   pnpm db:push
+   ```
+
+4. **Run development server**
+   ```bash
+   pnpm dev
+   ```
+
+5. **Access the app** at http://localhost:3000
+
+### Email Setup
+
+See `EMAIL_SETUP.md` for detailed email configuration and testing instructions.
+
+---
+
+**Built with ❤️ using Next.js 16, React 19, TypeScript, AI SDK 6, and Tailwind CSS**
+**Complete career intelligence platform with AI coaching and email notifications**
 **Ready for deployment and scale!**
