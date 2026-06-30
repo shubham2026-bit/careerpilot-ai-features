@@ -23,37 +23,37 @@ export interface NavItem {
 export const DASHBOARD_NAV_ITEMS: NavItem[] = [
   {
     label: 'Dashboard',
-    href: '/dashboard',
+    href: '/',
     icon: LayoutDashboard,
   },
   {
     label: 'Resume',
-    href: '/dashboard/resume',
+    href: '/resume',
     icon: FileText,
   },
   {
     label: 'LinkedIn',
-    href: '/dashboard/linkedin',
+    href: '/linkedin',
     icon: Briefcase,
   },
   {
     label: 'GitHub',
-    href: '/dashboard/github',
+    href: '/github',
     icon: Code,
   },
   {
     label: 'Portfolio',
-    href: '/dashboard/portfolio',
+    href: '/portfolio',
     icon: Globe,
   },
   {
     label: 'Jobs',
-    href: '/dashboard/jobs',
+    href: '/jobs',
     icon: Jobs,
   },
   {
     label: 'Career Coach',
-    href: '/dashboard/career-coach',
+    href: '/career-coach',
     icon: Wand2,
   },
 ]
@@ -61,17 +61,17 @@ export const DASHBOARD_NAV_ITEMS: NavItem[] = [
 export const ACCOUNT_NAV_ITEMS: NavItem[] = [
   {
     label: 'Notifications',
-    href: '/dashboard/notifications',
+    href: '/notifications',
     icon: Bell,
   },
   {
     label: 'Analytics',
-    href: '/dashboard/analytics',
+    href: '/analytics',
     icon: BarChart3,
   },
   {
     label: 'Settings',
-    href: '/dashboard/settings',
+    href: '/settings',
     icon: Settings,
   },
   {

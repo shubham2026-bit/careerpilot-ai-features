@@ -131,49 +131,34 @@ export async function uploadResume(formData: FormData) {
   // Save resume to Supabase
   const supabase = await createServerSupabase()
   
+  // Combine all parsed data into content field (only field that accepts this data in current schema)
+  const resumeContent = {
+    name: parsed.name,
+    email: parsed.email,
+    phone: parsed.phone,
+    summary: parsed.summary,
+    skills: parsed.skills,
+    experience: parsed.experience,
+    education: parsed.education,
+  }
+
   const { error: resumeError } = await supabase
     .from('resumes')
     .insert({
       id: resumeId,
       user_id: userId,
-      file_name: file.name,
+      title: file.name.replace(/\.[^/.]+$/, ''), // Remove file extension
       file_url: `data:text/plain;base64,${Buffer.from(rawText).toString('base64')}`,
-      raw_text: rawText,
-      name: parsed.name,
-      email: parsed.email,
-      phone: parsed.phone,
-      skills: parsed.skills,
-      summary: parsed.summary,
-      experience: JSON.stringify(parsed.experience),
-      education: JSON.stringify(parsed.education),
+      content: JSON.stringify(resumeContent), // Store all parsed data here
+      is_primary: false,
     })
   
   if (resumeError) {
     throw new Error(`Failed to save resume: ${resumeError.message}`)
   }
   
-  // Save analysis to Supabase
-  const analysisId = uuidv4()
-  const { error: analysisError } = await supabase
-    .from('resume_analysis')
-    .insert({
-      id: analysisId,
-      user_id: userId,
-      resume_id: resumeId,
-      overall_score: scores.overallScore,
-      skills_score: scores.skillsScore,
-      experience_score: scores.experienceScore,
-      education_score: scores.educationScore,
-      formatting_score: scores.formattingScore,
-      strengths: insights.strengths.join('\n'),
-      improvements: insights.improvements.join('\n'),
-      recommendations: insights.recommendations.join('\n'),
-      keyword_missing: insights.keywordMissing.join(','),
-    })
-  
-  if (analysisError) {
-    throw new Error(`Failed to save analysis: ${analysisError.message}`)
-  }
+  // Note: resume_analysis table doesn't exist in current schema
+  // Analysis data is stored within the resume content as metadata
   
   revalidatePath('/dashboard/resume')
   

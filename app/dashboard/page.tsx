@@ -7,7 +7,8 @@ export default function DashboardRedirect() {
   const router = useRouter()
 
   useEffect(() => {
-    router.replace('/resume')
+    // Redirect old /dashboard routes to new route group URLs
+    router.replace('/')
   }, [router])
 
   return (
