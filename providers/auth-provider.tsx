@@ -36,7 +36,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         
         const { data: { session } } = await supabase.auth.getSession()
-        console.log('[v0] Session check result:', session?.user?.email || 'no session')
         
         if (session?.user) {
           setAuthState({
