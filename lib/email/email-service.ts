@@ -3,7 +3,7 @@ import { ResumeAnalysisEmail } from './templates/resume-analysis-email'
 import { JobMatchEmail } from './templates/job-match-email'
 import { WeeklyDigestEmail } from './templates/weekly-digest-email'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = new Resend(process.env.RESEND_API_KEY || 'test-key')
 
 export const emailService = {
   /**

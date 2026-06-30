@@ -1,7 +1,8 @@
 'use client'
 
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
 import type { User, AuthState } from '@/lib/types/auth'
+import { getSupabaseClient, signIn as supabaseSignIn, signUp as supabaseSignUp, signOut as supabaseSignOut } from '@/lib/auth-client'
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>
@@ -11,45 +12,103 @@ interface AuthContextType extends AuthState {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-// Dummy user for demo purposes
-const DUMMY_USER: User = {
-  id: '1',
-  email: 'demo@careerpilot.ai',
-  name: 'Alex Johnson',
-  avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex',
-  createdAt: new Date('2024-01-15'),
-}
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authState, setAuthState] = useState<AuthState>({
     isAuthenticated: false,
     user: null,
-    isLoading: false,
+    isLoading: true,
     error: null,
   })
+
+  // Check current session on mount
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const supabase = getSupabaseClient()
+        if (!supabase) return
+        
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        if (session?.user) {
+          setAuthState({
+            isAuthenticated: true,
+            user: {
+              id: session.user.id,
+              email: session.user.email || '',
+              name: session.user.user_metadata?.full_name || '',
+              avatar: session.user.user_metadata?.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user',
+              createdAt: new Date(session.user.created_at),
+            },
+            isLoading: false,
+            error: null,
+          })
+        } else {
+          setAuthState({
+            isAuthenticated: false,
+            user: null,
+            isLoading: false,
+            error: null,
+          })
+        }
+      } catch (error) {
+        console.error('[v0] Session check error:', error)
+        setAuthState({
+          isAuthenticated: false,
+          user: null,
+          isLoading: false,
+          error: null,
+        })
+      }
+    }
+
+    checkSession()
+
+    // Subscribe to auth changes
+    const supabase = getSupabaseClient()
+    if (!supabase) return
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          setAuthState({
+            isAuthenticated: true,
+            user: {
+              id: session.user.id,
+              email: session.user.email || '',
+              name: session.user.user_metadata?.full_name || '',
+              avatar: session.user.user_metadata?.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user',
+              createdAt: new Date(session.user.created_at),
+            },
+            isLoading: false,
+            error: null,
+          })
+        } else {
+          setAuthState({
+            isAuthenticated: false,
+            user: null,
+            isLoading: false,
+            error: null,
+          })
+        }
+      }
+    )
+
+    return () => {
+      subscription?.unsubscribe()
+    }
+  }, [])
 
   const login = async (email: string, password: string) => {
     setAuthState((prev) => ({ ...prev, isLoading: true, error: null }))
     try {
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 800))
-
-      // Demo: any password works for the demo email
-      if (email === 'demo@careerpilot.ai' || email.includes('@')) {
-        setAuthState({
-          isAuthenticated: true,
-          user: { ...DUMMY_USER, email },
-          isLoading: false,
-          error: null,
-        })
-      } else {
-        throw new Error('Invalid credentials')
-      }
+      await supabaseSignIn(email, password)
+      // State will be updated by onAuthStateChange listener
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Login failed'
       setAuthState((prev) => ({
         ...prev,
         isLoading: false,
-        error: error instanceof Error ? error.message : 'Login failed',
+        error: errorMessage,
       }))
       throw error
     }
@@ -58,32 +117,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (email: string, password: string, name: string) => {
     setAuthState((prev) => ({ ...prev, isLoading: true, error: null }))
     try {
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 800))
-
-      setAuthState({
-        isAuthenticated: true,
-        user: { ...DUMMY_USER, email, name },
-        isLoading: false,
-        error: null,
-      })
+      await supabaseSignUp(email, password)
+      
+      // Update user metadata with name
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        await supabase.auth.updateUser({
+          data: { full_name: name }
+        })
+      }
+      // State will be updated by onAuthStateChange listener
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Registration failed'
       setAuthState((prev) => ({
         ...prev,
         isLoading: false,
-        error: error instanceof Error ? error.message : 'Registration failed',
+        error: errorMessage,
       }))
       throw error
     }
   }
 
-  const logout = () => {
-    setAuthState({
-      isAuthenticated: false,
-      user: null,
-      isLoading: false,
-      error: null,
-    })
+  const logout = async () => {
+    try {
+      await supabaseSignOut()
+      setAuthState({
+        isAuthenticated: false,
+        user: null,
+        isLoading: false,
+        error: null,
+      })
+    } catch (error) {
+      console.error('[v0] Logout error:', error)
+    }
   }
 
   return (
@@ -107,10 +173,10 @@ export function useAuth() {
     return {
       isAuthenticated: false,
       user: null,
-      isLoading: false,
+      isLoading: true,
       error: null,
       login: async () => {},
-      logout: () => {},
+      logout: async () => {},
       register: async () => {},
     }
   }

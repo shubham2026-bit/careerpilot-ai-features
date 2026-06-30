@@ -1,16 +1,28 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Zap, Menu, X } from 'lucide-react'
 import { useState } from 'react'
+import { useAuth } from '@/providers/auth-provider'
 import { DASHBOARD_NAV_ITEMS, ACCOUNT_NAV_ITEMS } from '@/lib/constants/navigation'
 import { cn } from '@/lib/utils'
 
 export function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+  const { logout } = useAuth()
   const [isOpen, setIsOpen] = useState(true)
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      router.push('/login')
+    } catch (error) {
+      console.error('[v0] Logout failed:', error)
+    }
+  }
 
   return (
     <>
@@ -85,6 +97,24 @@ export function Sidebar() {
             {ACCOUNT_NAV_ITEMS.map((item) => {
               const Icon = item.icon
               const isActive = pathname === item.href
+              
+              if (item.label === 'Logout') {
+                return (
+                  <button
+                    key="logout"
+                    onClick={handleLogout}
+                    className={cn(
+                      'w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200',
+                      'text-sidebar-foreground hover:bg-sidebar-accent',
+                      'text-destructive hover:bg-destructive/10'
+                    )}
+                  >
+                    <Icon size={20} />
+                    <span>{item.label}</span>
+                  </button>
+                )
+              }
+              
               return (
                 <Link
                   key={item.href}
@@ -93,8 +123,7 @@ export function Sidebar() {
                     'flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200',
                     isActive
                       ? 'bg-sidebar-primary text-sidebar-primary-foreground'
-                      : 'text-sidebar-foreground hover:bg-sidebar-accent',
-                    item.label === 'Logout' && 'text-destructive hover:bg-destructive/10'
+                      : 'text-sidebar-foreground hover:bg-sidebar-accent'
                   )}
                 >
                   <Icon size={20} />

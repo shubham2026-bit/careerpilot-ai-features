@@ -1,0 +1,92 @@
+================================================================================
+                   ENVIRONMENT VARIABLES - QUICK REFERENCE
+================================================================================
+
+ALREADY SET (5):
+  NEXT_PUBLIC_SUPABASE_URL
+  NEXT_PUBLIC_SUPABASE_ANON_KEY
+  SUPABASE_SERVICE_ROLE_KEY
+  DATABASE_URL
+  RESEND_API_KEY
+
+NEED TO ADD (5):
+  1. GITHUB_OAUTH_CLIENT_ID
+  2. GITHUB_OAUTH_CLIENT_SECRET
+  3. LINKEDIN_OAUTH_CLIENT_ID
+  4. LINKEDIN_OAUTH_CLIENT_SECRET
+  5. CRON_SECRET
+
+================================================================================
+                        3-STEP SETUP PROCESS
+================================================================================
+
+STEP 1: GET GITHUB OAUTH (2 minutes)
+  1. Go to: https://github.com/settings/developers
+  2. Click "New OAuth App"
+  3. Fill in:
+     - Name: CareerPilot AI
+     - Homepage: https://yourdomain.com
+     - Callback: https://yourdomain.com/api/auth/github/callback
+  4. Copy Client ID and Secret
+
+STEP 2: GET LINKEDIN OAUTH (2 minutes)
+  1. Go to: https://www.linkedin.com/developers/apps
+  2. Click "Create App"
+  3. Fill in app details
+  4. Add redirect URL: https://yourdomain.com/api/auth/linkedin/callback
+  5. Copy Client ID and Secret
+
+STEP 3: GENERATE CRON_SECRET (1 minute)
+  1. Run: openssl rand -base64 32
+  2. Or use: https://www.random.org/strings/
+  3. Copy the generated string
+
+================================================================================
+                        COPY-PASTE TEMPLATE
+================================================================================
+
+GITHUB_OAUTH_CLIENT_ID=YOUR_GITHUB_ID
+GITHUB_OAUTH_CLIENT_SECRET=YOUR_GITHUB_SECRET
+LINKEDIN_OAUTH_CLIENT_ID=YOUR_LINKEDIN_ID
+LINKEDIN_OAUTH_CLIENT_SECRET=YOUR_LINKEDIN_SECRET
+CRON_SECRET=YOUR_RANDOM_32_CHARS
+NEXT_PUBLIC_APP_URL=https://yourdomain.com
+
+================================================================================
+                      HOW TO ADD TO VERCEL (2 minutes)
+================================================================================
+
+1. Go to: https://vercel.com/dashboard
+2. Select CareerPilot AI project
+3. Click "Settings" → "Environment Variables"
+4. Click "Add New" for each variable
+5. Paste name and value
+6. Select Production, Preview, Development
+7. Click Save
+8. Redeploy project
+
+================================================================================
+                         VERIFICATION (1 minute)
+================================================================================
+
+After setup, check:
+1. Visit: https://yourdomain.com/login
+2. See GitHub button? ✓
+3. See LinkedIn button? ✓
+4. Click GitHub → authenticate ✓
+5. Redirects back to app? ✓
+
+If not working:
+- Check all 5 variables are set
+- Verify redirect URLs match exactly
+- Check Vercel logs for errors
+- Redeploy if variables changed
+
+================================================================================
+                            TOTAL TIME: 5-10 minutes
+================================================================================
+
+All environment variables documented in:
+  → ENV_COPY_PASTE_FORMAT.md (complete guide)
+  → MASTER_DEPLOYMENT_GUIDE.md (full deployment)
+
