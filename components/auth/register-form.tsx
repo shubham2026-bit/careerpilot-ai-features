@@ -42,8 +42,11 @@ export function RegisterForm() {
         title: 'Account created!',
         message: 'Your account has been created successfully.',
       })
-      // Small delay to let auth state update
-      setTimeout(() => router.push('/dashboard'), 500)
+      // Delay to ensure session is persisted and auth state is updated
+      setTimeout(() => {
+        console.log('[v0] Redirecting to dashboard after registration')
+        router.push('/dashboard')
+      }, 1000)
     } catch (error) {
       setIsLoading(false)
       const errorMessage = error instanceof Error ? error.message : 'Please try again.'
