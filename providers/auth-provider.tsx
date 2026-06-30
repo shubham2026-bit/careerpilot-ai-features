@@ -25,7 +25,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const checkSession = async () => {
       try {
         const supabase = getSupabaseClient()
-        if (!supabase) return
+        if (!supabase) {
+          setAuthState({
+            isAuthenticated: false,
+            user: null,
+            isLoading: false,
+            error: 'Supabase client not initialized',
+          })
+          return
+        }
         
         const { data: { session } } = await supabase.auth.getSession()
         
@@ -65,7 +73,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Subscribe to auth changes
     const supabase = getSupabaseClient()
-    if (!supabase) return
+    if (!supabase) {
+      return
+    }
     
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
