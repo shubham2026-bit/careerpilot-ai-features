@@ -4,13 +4,28 @@ import {
   streamText,
   UIMessage,
 } from 'ai'
+import { NextRequest, NextResponse } from 'next/server'
+import { createServerSupabase } from '@/lib/supabase/server'
 
 export const maxDuration = 30
 
-export async function POST(req: Request) {
-  const { messages }: { messages: UIMessage[] } = await req.json()
+export async function POST(req: NextRequest) {
+  try {
+    // Authenticate user
+    const supabase = await createServerSupabase()
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
-  const careerCoachSystem = `You are an expert AI Career Coach with decades of experience in career development, executive coaching, and industry insights. Your role is to provide personalized, actionable career advice to help professionals advance their careers.
+    const { messages }: { messages: UIMessage[] } = await req.json()
+
+    if (!messages || messages.length === 0) {
+      return NextResponse.json({ error: 'No messages provided' }, { status: 400 })
+    }
+
+    const careerCoachSystem = `You are an expert AI Career Coach with decades of experience in career development, executive coaching, and industry insights. Your role is to provide personalized, actionable career advice to help professionals advance their careers.
 
 Key Principles:
 - Be empathetic, encouraging, and professional
@@ -30,19 +45,23 @@ When giving advice:
 5. Empower them to make informed decisions
 6. Follow up with practical implementation strategies`
 
-  const result = streamText({
-    model: 'openai/gpt-5-mini',
-    system: careerCoachSystem,
-    messages: await convertToModelMessages(messages),
-    abortSignal: req.signal,
-  })
+    const result = streamText({
+      model: 'openai/gpt-4o-mini', // FIXED: Use correct model name
+      system: careerCoachSystem,
+      messages: await convertToModelMessages(messages),
+      abortSignal: req.signal,
+    })
 
-  return result.toUIMessageStreamResponse({
-    originalMessages: messages,
-    onFinish: async ({ messages: allMessages, isAborted }) => {
-      if (isAborted) return
-      // Could save chat history to database here
-    },
-    consumeSseStream: consumeStream,
-  })
+    return result.toUIMessageStreamResponse({
+      originalMessages: messages,
+      onFinish: async ({ messages: allMessages, isAborted }) => {
+        if (isAborted) return
+        // Could save chat history to database here
+      },
+      consumeSseStream: consumeStream,
+    })
+  } catch (error) {
+    console.error('[v0] Chat API error:', error)
+    return NextResponse.json({ error: 'Failed to process chat' }, { status: 500 })
+  }
 }

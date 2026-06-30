@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase/server'
+import { verifyAdminAccess } from '@/lib/auth/admin'
 
 export const maxDuration = 60
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createServerSupabase()
-
-    // Verify admin access
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // CRITICAL: Verify admin access before proceeding
+    const isAdmin = await verifyAdminAccess()
+    if (!isAdmin) {
+      return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 403 })
     }
+
+    const supabase = await createServerSupabase()
 
     // Get pagination params
     const searchParams = request.nextUrl.searchParams
