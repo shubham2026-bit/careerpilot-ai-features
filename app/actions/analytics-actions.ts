@@ -32,11 +32,11 @@ export async function initializeUserAnalytics() {
       userId,
       totalResumeUploads: 0,
       totalProfileViews: 0,
-      averageResumeScore: 0,
-      careerGrowthScore: 0,
-      jobMatchPercentage: 0,
-      skillGaps: [],
-      topSkills: [],
+      averageResumeScore: '0',
+      careerGrowthScore: '0',
+      jobMatchPercentage: '0',
+      skillGaps: JSON.stringify([]),
+      topSkills: JSON.stringify([]),
       activityLog: [],
     })
     .returning()

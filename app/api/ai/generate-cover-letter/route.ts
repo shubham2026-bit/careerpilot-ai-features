@@ -58,7 +58,6 @@ Format it as a complete cover letter ready to send. Include placeholders for [Yo
       model: 'gpt-4o-mini',
       prompt,
       temperature: 0.8,
-      maxTokens: 1024,
     })
 
     // Track usage
