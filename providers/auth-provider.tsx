@@ -25,9 +25,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const checkSession = async () => {
       try {
         const supabase = getSupabaseClient()
-        if (!supabase) return
+        if (!supabase) {
+          setAuthState({
+            isAuthenticated: false,
+            user: null,
+            isLoading: false,
+            error: 'Supabase client not initialized',
+          })
+          return
+        }
         
         const { data: { session } } = await supabase.auth.getSession()
+        console.log('[v0] Session check result:', session?.user?.email || 'no session')
         
         if (session?.user) {
           setAuthState({
@@ -65,7 +74,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Subscribe to auth changes
     const supabase = getSupabaseClient()
-    if (!supabase) return
+    if (!supabase) {
+      return
+    }
     
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -101,8 +112,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     setAuthState((prev) => ({ ...prev, isLoading: true, error: null }))
     try {
-      await supabaseSignIn(email, password)
-      // State will be updated by onAuthStateChange listener
+      const data = await supabaseSignIn(email, password)
+      
+      // Immediately update state with the authenticated user
+      if (data.user) {
+        setAuthState({
+          isAuthenticated: true,
+          user: {
+            id: data.user.id,
+            email: data.user.email || '',
+            name: data.user.user_metadata?.full_name || '',
+            avatar: data.user.user_metadata?.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user',
+            createdAt: new Date(data.user.created_at),
+          },
+          isLoading: false,
+          error: null,
+        })
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Login failed'
       setAuthState((prev) => ({
@@ -117,16 +143,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (email: string, password: string, name: string) => {
     setAuthState((prev) => ({ ...prev, isLoading: true, error: null }))
     try {
-      await supabaseSignUp(email, password)
+      const data = await supabaseSignUp(email, password)
       
       // Update user metadata with name
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
+      const supabase = getSupabaseClient()
+      if (supabase && data.user) {
         await supabase.auth.updateUser({
           data: { full_name: name }
         })
+        
+        // Set authenticated state for newly registered user
+        setAuthState({
+          isAuthenticated: true,
+          user: {
+            id: data.user.id,
+            email: data.user.email || '',
+            name: name,
+            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + email,
+            createdAt: new Date(data.user.created_at),
+          },
+          isLoading: false,
+          error: null,
+        })
       }
-      // State will be updated by onAuthStateChange listener
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Registration failed'
       setAuthState((prev) => ({
