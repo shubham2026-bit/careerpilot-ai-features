@@ -24,6 +24,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkSession = async () => {
       try {
+        // Check for demo session first
+        if (typeof window !== 'undefined') {
+          const demoSession = localStorage.getItem('demo_session')
+          if (demoSession) {
+            const session = JSON.parse(demoSession)
+            console.log('[v0] Using demo session:', session.user.email)
+            setAuthState({
+              isAuthenticated: true,
+              user: {
+                id: session.user.id,
+                email: session.user.email || '',
+                name: session.user.user_metadata?.full_name || '',
+                avatar: session.user.user_metadata?.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user',
+                createdAt: new Date(session.user.created_at),
+              },
+              isLoading: false,
+              error: null,
+            })
+            return
+          }
+        }
+        
         const supabase = getSupabaseClient()
         if (!supabase) {
           setAuthState({
