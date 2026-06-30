@@ -20,6 +20,9 @@ export function getSupabaseClient() {
 }
 
 export const signIn = async (email: string, password: string) => {
+  const supabase = getSupabaseClient()
+  if (!supabase) throw new Error('Supabase client not initialized')
+  
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -29,15 +32,25 @@ export const signIn = async (email: string, password: string) => {
 }
 
 export const signUp = async (email: string, password: string) => {
+  const supabase = getSupabaseClient()
+  if (!supabase) throw new Error('Supabase client not initialized')
+  
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ??
+        `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`,
+    },
   })
   if (error) throw error
   return data
 }
 
 export const signOut = async () => {
+  const supabase = getSupabaseClient()
+  if (!supabase) throw new Error('Supabase client not initialized')
+  
   const { error } = await supabase.auth.signOut()
   if (error) throw error
 }

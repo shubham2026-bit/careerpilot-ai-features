@@ -120,11 +120,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await supabaseSignUp(email, password)
       
       // Update user metadata with name
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        await supabase.auth.updateUser({
-          data: { full_name: name }
-        })
+      const supabase = getSupabaseClient()
+      if (supabase) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          await supabase.auth.updateUser({
+            data: { full_name: name }
+          })
+        }
       }
       // State will be updated by onAuthStateChange listener
     } catch (error) {
