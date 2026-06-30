@@ -3,22 +3,19 @@ import { createServerSupabase } from '@/lib/supabase/server'
 import { db } from '@/lib/db'
 import { userAnalytics, resumes, notifications } from '@/lib/db/schema'
 import { count } from 'drizzle-orm'
+import { verifyAdminAccess } from '@/lib/auth/admin'
 
 export const maxDuration = 60
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createServerSupabase()
-
-    // Verify admin access
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // CRITICAL: Verify admin access before proceeding
+    const isAdmin = await verifyAdminAccess()
+    if (!isAdmin) {
+      return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 403 })
     }
 
-    // Check if user is admin (this should be in user metadata or a separate admin table)
-    // For now, we'll allow all authenticated users to view stats
-    // In production, add proper admin role verification
+    const supabase = await createServerSupabase()
 
     // Get user count
     const { data: users } = await supabase.auth.admin.listUsers()

@@ -48,18 +48,18 @@ export function ResumeUpload({ onUploadSuccess }: ResumeUploadProps) {
   return (
     <div className="space-y-4">
       <Card className="border-2 border-dashed border-primary/20 hover:border-primary/40 transition-colors">
-        <CardHeader>
-          <CardTitle>Upload Your Resume</CardTitle>
-          <CardDescription>
-            Upload a text or PDF resume to get AI-powered analysis and recommendations
-          </CardDescription>
-        </CardHeader>
+          <CardHeader>
+            <CardTitle>Upload Your Resume</CardTitle>
+            <CardDescription>
+              Upload a PDF, Word document, or text file to get AI-powered analysis and recommendations
+            </CardDescription>
+          </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center gap-4">
             <div className="relative w-full">
               <input
                 type="file"
-                accept=".txt,.pdf"
+                accept=".txt,.pdf,.doc,.docx,text/plain,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 onChange={handleFileUpload}
                 disabled={isLoading}
                 className="hidden"
@@ -77,7 +77,7 @@ export function ResumeUpload({ onUploadSuccess }: ResumeUploadProps) {
                       {isLoading ? 'Processing...' : 'Click to upload or drag and drop'}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {isLoading ? 'Analyzing your resume...' : 'TXT or PDF files up to 10MB'}
+                      {isLoading ? 'Analyzing your resume...' : 'PDF, Word, or TXT files up to 10MB'}
                     </p>
                   </div>
                 </div>

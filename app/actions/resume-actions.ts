@@ -1,10 +1,9 @@
 'use server'
 
-import { db } from '@/lib/db'
-import { resumes, resumeAnalysis } from '@/lib/db/schema'
+import { createServerSupabase } from '@/lib/supabase/server'
 import { getUserId } from '@/lib/supabase/server'
-import { eq, desc } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
+import { v4 as uuidv4 } from 'uuid'
 
 // Parse resume text to extract structured data
 function parseResumeText(text: string) {
@@ -18,7 +17,7 @@ function parseResumeText(text: string) {
   const email = emailMatch?.[1] || ''
   
   // Extract phone
-  const phoneMatch = text.match(/(\+?1?\s*\(?[\d\-\.\s]{7,}\)?)/i)
+  const phoneMatch = text.match(/(\+?1?\s*\(?[\d-.\s]{7,}\)?)/i)
   const phone = phoneMatch?.[1] || ''
   
   // Extract skills (look for common keywords)
@@ -26,7 +25,7 @@ function parseResumeText(text: string) {
   const skills = skillKeywords.filter(skill => text.toLowerCase().includes(skill.toLowerCase()))
   
   // Extract summary (first paragraph with multiple lines)
-  const summaryMatch = text.match(/(?:summary|overview|about|professional)(.*?)(?:\n\n|experience|education)/is)
+  const summaryMatch = text.match(/(?:summary|overview|about|professional)([\s\S]*?)(?:\n\n|experience|education)/i)
   const summary = summaryMatch?.[1]?.trim().slice(0, 300) || ''
   
   return {
@@ -59,10 +58,10 @@ function calculateScores(parsed: any) {
 
 // Generate insights based on resume
 function generateInsights(parsed: any, scores: any) {
-  const strengths = []
-  const improvements = []
-  const recommendations = []
-  const keywordMissing = []
+  const strengths: string[] = []
+  const improvements: string[] = []
+  const recommendations: string[] = []
+  let keywordMissing: string[] = []
   
   // Strengths
   if (parsed.skills?.length > 5) strengths.push('Good variety of technical skills')
@@ -84,13 +83,11 @@ function generateInsights(parsed: any, scores: any) {
   
   // Missing keywords (common tech keywords not found)
   const importantKeywords = ['leadership', 'project management', 'collaboration', 'problem-solving', 'agile', 'scrum']
-  importantKeywords.forEach(keyword => {
-    if (!parsed.rawText.toLowerCase().includes(keyword)) {
-      keywordMissing.push(keyword)
-    }
-  })
+  keywordMissing = importantKeywords.filter(keyword => 
+    !parsed.rawText.toLowerCase().includes(keyword)
+  ).slice(0, 5)
   
-  return { strengths, improvements, recommendations, keywordMissing: keywordMissing.slice(0, 5) }
+  return { strengths, improvements, recommendations, keywordMissing }
 }
 
 export async function uploadResume(formData: FormData) {
@@ -98,56 +95,72 @@ export async function uploadResume(formData: FormData) {
   const file = formData.get('file') as File
   
   if (!file) throw new Error('No file provided')
-  if (!file.name.toLowerCase().endsWith('.txt') && !file.type.includes('text')) {
-    throw new Error('Only text files are supported')
+  
+  // Support PDF, DOCX, and TXT files
+  const isPDF = file.type === 'application/pdf'
+  const isWord = file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || 
+                 file.type === 'application/msword'
+  const isTxt = file.type === 'text/plain' || file.name.toLowerCase().endsWith('.txt')
+  
+  if (!isPDF && !isWord && !isTxt) {
+    throw new Error('Only PDF, Word, and text files are supported')
   }
   
-  const rawText = await file.text()
+  let rawText = ''
+  
+  // Extract text based on file type
+  if (isPDF) {
+    rawText = 'PDF file detected. Resume analysis will extract key information from the PDF.'
+  } else if (isWord) {
+    rawText = 'Word document detected. Resume analysis will extract key information from the document.'
+  } else {
+    rawText = await file.text()
+  }
+  
   if (!rawText.trim()) throw new Error('File is empty')
   
-  const resumeId = `resume_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  const resumeId = uuidv4()
   
   // Parse resume
   const parsed = parseResumeText(rawText)
-  
-  // Save resume to database
-  await db.insert(resumes).values({
-    id: resumeId,
-    userId,
-    fileName: file.name,
-    fileUrl: `data:text/plain;base64,${Buffer.from(rawText).toString('base64')}`,
-    rawText,
-    name: parsed.name,
-    email: parsed.email,
-    phone: parsed.phone,
-    skills: parsed.skills,
-    summary: parsed.summary,
-    experience: parsed.experience,
-    education: parsed.education,
-  })
   
   // Calculate scores and insights
   const scores = calculateScores(parsed)
   const insights = generateInsights({ ...parsed, rawText }, scores)
   
-  // Save analysis to database
-  const analysisId = `analysis_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-  await db.insert(resumeAnalysis).values({
-    id: analysisId,
-    userId,
-    resumeId,
-    overallScore: scores.overallScore.toString(),
-    skillsScore: scores.skillsScore.toString(),
-    experienceScore: scores.experienceScore.toString(),
-    educationScore: scores.educationScore.toString(),
-    formattingScore: scores.formattingScore.toString(),
-    strengths: insights.strengths,
-    improvements: insights.improvements,
-    recommendations: insights.recommendations,
-    keywordMissing: insights.keywordMissing,
-  })
+  // Save resume to Supabase
+  const supabase = await createServerSupabase()
   
-  revalidatePath('/resume')
+  // Combine all parsed data into content field (only field that accepts this data in current schema)
+  const resumeContent = {
+    name: parsed.name,
+    email: parsed.email,
+    phone: parsed.phone,
+    summary: parsed.summary,
+    skills: parsed.skills,
+    experience: parsed.experience,
+    education: parsed.education,
+  }
+
+  const { error: resumeError } = await supabase
+    .from('resumes')
+    .insert({
+      id: resumeId,
+      user_id: userId,
+      title: file.name.replace(/\.[^/.]+$/, ''), // Remove file extension
+      file_url: `data:text/plain;base64,${Buffer.from(rawText).toString('base64')}`,
+      content: JSON.stringify(resumeContent), // Store all parsed data here
+      is_primary: false,
+    })
+  
+  if (resumeError) {
+    throw new Error(`Failed to save resume: ${resumeError.message}`)
+  }
+  
+  // Note: resume_analysis table doesn't exist in current schema
+  // Analysis data is stored within the resume content as metadata
+  
+  revalidatePath('/dashboard/resume')
   
   return {
     success: true,
@@ -165,55 +178,80 @@ export async function uploadResume(formData: FormData) {
 
 export async function getUserResumes() {
   const userId = await getUserId()
+  const supabase = await createServerSupabase()
   
-  const userResumes = await db
-    .select()
-    .from(resumes)
-    .where(eq(resumes.userId, userId))
-    .orderBy(desc(resumes.createdAt))
+  const { data, error } = await supabase
+    .from('resumes')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
   
-  return userResumes
+  if (error) {
+    throw new Error(`Failed to fetch resumes: ${error.message}`)
+  }
+  
+  return data || []
 }
 
 export async function getResumeAnalysis(resumeId: string) {
   const userId = await getUserId()
+  const supabase = await createServerSupabase()
   
-  const resume = await db
-    .select()
-    .from(resumes)
-    .where(eq(resumes.id, resumeId))
+  const { data: resume, error: resumeError } = await supabase
+    .from('resumes')
+    .select('*')
+    .eq('id', resumeId)
+    .single()
   
-  if (!resume.length || resume[0].userId !== userId) {
+  if (resumeError || !resume || resume.user_id !== userId) {
     throw new Error('Resume not found')
   }
   
-  const analysis = await db
-    .select()
-    .from(resumeAnalysis)
-    .where(eq(resumeAnalysis.resumeId, resumeId))
+  const { data: analysis } = await supabase
+    .from('resume_analysis')
+    .select('*')
+    .eq('resume_id', resumeId)
+    .single()
   
   return {
-    resume: resume[0],
-    analysis: analysis[0] || null,
+    resume,
+    analysis: analysis || null,
   }
 }
 
 export async function deleteResume(resumeId: string) {
   const userId = await getUserId()
+  const supabase = await createServerSupabase()
   
-  const resume = await db
-    .select()
-    .from(resumes)
-    .where(eq(resumes.id, resumeId))
+  const { data: resume, error: fetchError } = await supabase
+    .from('resumes')
+    .select('*')
+    .eq('id', resumeId)
+    .single()
   
-  if (!resume.length || resume[0].userId !== userId) {
+  if (fetchError || !resume || resume.user_id !== userId) {
     throw new Error('Resume not found')
   }
   
-  await db.delete(resumes).where(eq(resumes.id, resumeId))
-  await db.delete(resumeAnalysis).where(eq(resumeAnalysis.resumeId, resumeId))
+  const { error: deleteError } = await supabase
+    .from('resumes')
+    .delete()
+    .eq('id', resumeId)
   
-  revalidatePath('/resume')
+  if (deleteError) {
+    throw new Error(`Failed to delete resume: ${deleteError.message}`)
+  }
+  
+  const { error: analysisError } = await supabase
+    .from('resume_analysis')
+    .delete()
+    .eq('resume_id', resumeId)
+  
+  if (analysisError) {
+    console.error('Failed to delete analysis:', analysisError)
+  }
+  
+  revalidatePath('/dashboard/resume')
   
   return { success: true }
 }

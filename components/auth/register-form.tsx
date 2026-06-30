@@ -45,7 +45,7 @@ export function RegisterForm() {
       // Delay to ensure session is persisted and auth state is updated
       setTimeout(() => {
         console.log('[v0] Redirecting to dashboard after registration')
-        router.push('/dashboard')
+        router.push('/') // Redirect to dashboard home
       }, 1000)
     } catch (error) {
       setIsLoading(false)

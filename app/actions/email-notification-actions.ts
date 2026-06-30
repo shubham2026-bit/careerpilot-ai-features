@@ -44,9 +44,9 @@ export async function sendResumeAnalysisEmail(
     }
 
     // Send email
-    const analysisUrl = `${process.env.NEXT_PUBLIC_APP_URL}/resume`
+    const analysisUrl = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/resume`
     const result = await emailService.sendResumeAnalysis(userEmail, {
-      userName: session.user.name || 'User',
+      userName: userEmail.split('@')[0] || 'User',
       resumeName: resumeFileName,
       overallScore,
       topStrengths,
