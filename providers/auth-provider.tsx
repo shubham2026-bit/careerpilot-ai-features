@@ -111,8 +111,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     setAuthState((prev) => ({ ...prev, isLoading: true, error: null }))
     try {
-      await supabaseSignIn(email, password)
-      // State will be updated by onAuthStateChange listener
+      const data = await supabaseSignIn(email, password)
+      
+      // Immediately update state with the authenticated user
+      if (data.user) {
+        setAuthState({
+          isAuthenticated: true,
+          user: {
+            id: data.user.id,
+            email: data.user.email || '',
+            name: data.user.user_metadata?.full_name || '',
+            avatar: data.user.user_metadata?.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user',
+            createdAt: new Date(data.user.created_at),
+          },
+          isLoading: false,
+          error: null,
+        })
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Login failed'
       setAuthState((prev) => ({
@@ -127,19 +142,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (email: string, password: string, name: string) => {
     setAuthState((prev) => ({ ...prev, isLoading: true, error: null }))
     try {
-      await supabaseSignUp(email, password)
+      const data = await supabaseSignUp(email, password)
       
       // Update user metadata with name
       const supabase = getSupabaseClient()
-      if (supabase) {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          await supabase.auth.updateUser({
-            data: { full_name: name }
-          })
-        }
+      if (supabase && data.user) {
+        await supabase.auth.updateUser({
+          data: { full_name: name }
+        })
+        
+        // Set authenticated state for newly registered user
+        setAuthState({
+          isAuthenticated: true,
+          user: {
+            id: data.user.id,
+            email: data.user.email || '',
+            name: name,
+            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + email,
+            createdAt: new Date(data.user.created_at),
+          },
+          isLoading: false,
+          error: null,
+        })
       }
-      // State will be updated by onAuthStateChange listener
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Registration failed'
       setAuthState((prev) => ({
