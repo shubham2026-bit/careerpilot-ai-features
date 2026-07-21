@@ -52,7 +52,7 @@ CareerPilot AI is a comprehensive AI-powered career intelligence platform with *
 - **OpenAI** - GPT-4o models for AI features
 - **Resend** - Email delivery service
 - **Supabase/PostgreSQL** - Database with authentication
-- **Neon** - Configured for production database
+- **Supabase** - PostgreSQL database with Row Level Security (RLS)
 - **Vercel Analytics** - Production analytics tracking
 
 ### Security & Configuration
@@ -92,7 +92,7 @@ if (error) {
 ```
 
 **What Needs to Happen:**
-1. Choose ONE auth system: Better Auth OR Supabase (recommend Better Auth with Neon)
+1. Use Supabase for database AND authentication (recommended stack)
 2. Remove demo mode fallback
 3. Properly initialize Better Auth server-side
 4. Implement proper error handling (don't fake auth)
@@ -504,7 +504,7 @@ Build warning: `The "middleware" file convention is deprecated. Please use "prox
 - No failover mechanism
 
 **What Needs to Happening:**
-1. Configure Neon automated backups
+1. Configure Supabase automated backups
 2. Document recovery procedure
 3. Test recovery regularly
 
@@ -584,7 +584,7 @@ Build warning: `The "middleware" file convention is deprecated. Please use "prox
 
 1. **Fix Authentication System** (3-4 days)
    - Remove demo mode fallback
-   - Choose: Better Auth + Neon OR Supabase Auth
+   - Use: Supabase Auth (recommended)
    - Implement OAuth properly
    - Add auth tests
 
@@ -696,7 +696,9 @@ Build warning: `The "middleware" file convention is deprecated. Please use "prox
 ### Critical (Must Set)
 ```bash
 # Database
-DATABASE_URL=postgresql://user:password@host/db
+NEXT_PUBLIC_SUPABASE_URL=https://project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=key_here
+SUPABASE_SERVICE_ROLE_KEY=key_here
 BETTER_AUTH_SECRET=$(openssl rand -base64 32)
 BETTER_AUTH_URL=http://localhost:3000  # or production URL
 
@@ -817,7 +819,7 @@ NEXT_PUBLIC_ANALYTICS_ID=xxxxx
 | **Frontend** | Next.js 16, React 19, TypeScript | ✅ Complete | Excellent foundation |
 | **Styling** | Tailwind CSS, shadcn/ui | ✅ Complete | Professional design system |
 | **Backend** | Next.js API Routes, Server Actions | ✅ Complete | Well-structured |
-| **Database** | PostgreSQL (Neon), Drizzle ORM | ✅ Complete | Production-ready |
+| **Database** | PostgreSQL (Supabase), Drizzle ORM | ✅ Complete | Production-ready |
 | **Auth** | Better Auth + Supabase | ⚠️ Conflicting | **Need to resolve** |
 | **AI** | Vercel AI SDK 6, OpenAI | ✅ Complete | Latest version |
 | **Email** | Resend | ✅ Complete | Good choice |

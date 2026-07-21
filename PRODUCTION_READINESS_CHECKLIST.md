@@ -66,14 +66,16 @@
 
 ## 2. Environment Variables You Need to Add
 
-### Database Connection
+### Database Connection (Supabase)
 ```
-DATABASE_URL=postgresql://user:password@host:5432/careerpilot
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 ```
-- **Purpose:** PostgreSQL connection string
-- **Get from:** Neon console
+- **Purpose:** Supabase PostgreSQL connection
+- **Get from:** Supabase Project Settings → API
 - **Status:** ❌ NOT PROVIDED
-- **Format:** Must be valid PostgreSQL URL
+- **Format:** Required for all database operations and RLS policies
 
 ### Authentication
 ```
@@ -149,14 +151,17 @@ ADMIN_EMAILS=admin@yourdomain.com,admin2@yourdomain.com
 
 ## 3. External Accounts You Need to Create
 
-### Neon PostgreSQL Database (REQUIRED)
-- **Website:** https://neon.tech
+### Supabase PostgreSQL Database (REQUIRED)
+- **Website:** https://supabase.com
 - **What to do:**
   1. Sign up for free account
   2. Create new project
-  3. Copy connection string (DATABASE_URL)
-  4. Save in Vercel as DATABASE_URL
-- **Why:** Primary database for all user and app data
+  3. Go to Project Settings → API
+  4. Copy and save:
+     - `NEXT_PUBLIC_SUPABASE_URL`
+     - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+     - `SUPABASE_SERVICE_ROLE_KEY`
+- **Why:** Primary database with built-in authentication and Row Level Security (RLS)
 - **Status:** ❌ NOT CREATED
 
 ### Vercel Deployment Account (REQUIRED)
@@ -214,15 +219,18 @@ ADMIN_EMAILS=admin@yourdomain.com,admin2@yourdomain.com
 
 ## 4. Manual Dashboard Configuration
 
-### Neon PostgreSQL Setup
-- [ ] Create account at neon.tech
+### Supabase PostgreSQL Setup
+- [ ] Create account at supabase.com
 - [ ] Create new project
 - [ ] Wait for database initialization (2-3 minutes)
-- [ ] Copy connection string
-- [ ] Note: Database name and credentials
+- [ ] Go to Project Settings → API
+- [ ] Copy all three keys:
+  - `NEXT_PUBLIC_SUPABASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+  - `SUPABASE_SERVICE_ROLE_KEY`
 
 **In Vercel Dashboard:**
-- [ ] Add `DATABASE_URL` environment variable
+- [ ] Add the three Supabase environment variables
 
 **Then in terminal (after Vercel deployment):**
 ```bash
@@ -238,7 +246,9 @@ pnpm db:push
 
 | Variable | Type | Status |
 |----------|------|--------|
-| DATABASE_URL | Secret | ❌ |
+| NEXT_PUBLIC_SUPABASE_URL | Standard | ❌ |
+| NEXT_PUBLIC_SUPABASE_ANON_KEY | Standard | ❌ |
+| SUPABASE_SERVICE_ROLE_KEY | Secret | ❌ |
 | BETTER_AUTH_SECRET | Secret | ❌ |
 | BETTER_AUTH_URL | Standard | ❌ |
 | OPENAI_API_KEY | Secret | ❌ |
@@ -250,9 +260,6 @@ pnpm db:push
 | LINKEDIN_OAUTH_CLIENT_ID | Standard | ❌ |
 | LINKEDIN_OAUTH_CLIENT_SECRET | Secret | ❌ |
 | NEXT_PUBLIC_APP_URL | Standard | ❌ |
-| NEXT_PUBLIC_SUPABASE_URL | Standard | ❌ |
-| NEXT_PUBLIC_SUPABASE_ANON_KEY | Standard | ❌ |
-| SUPABASE_SERVICE_ROLE_KEY | Secret | ❌ |
 | ADMIN_EMAILS | Standard | ❌ (OPTIONAL) |
 
 - [ ] Deploy: Click Deploy button or `git push`
@@ -386,12 +393,14 @@ pnpm db:push
 - [ ] CORS is properly configured
 - [ ] Rate limiting is configured
 
-#### Database
-- [ ] Neon database created
-- [ ] DATABASE_URL added to Vercel
+#### Database (Supabase)
+- [ ] Supabase project created
+- [ ] NEXT_PUBLIC_SUPABASE_URL added to Vercel
+- [ ] NEXT_PUBLIC_SUPABASE_ANON_KEY added to Vercel
+- [ ] SUPABASE_SERVICE_ROLE_KEY added to Vercel
 - [ ] Migrations run: `pnpm db:push`
 - [ ] Database schema verified
-- [ ] RLS policies enabled (Supabase)
+- [ ] RLS policies enabled in Supabase
 
 #### Email
 - [ ] Brevo account created
@@ -482,7 +491,7 @@ pnpm db:push
 
 ### CRITICAL (Cannot launch without these)
 1. ❌ OpenAI API key and account
-2. ❌ Neon PostgreSQL database
+2. ❌ Supabase PostgreSQL project
 3. ❌ Brevo email account
 4. ❌ BETTER_AUTH_SECRET (needs to be generated)
 5. ❌ CRON_SECRET (needs to be generated)
@@ -512,10 +521,12 @@ CRON_SECRET=$(openssl rand -base64 32)
 # 2. Get these from services:
 # - OpenAI API key from https://platform.openai.com/api-keys
 # - Brevo API key from https://brevo.com/smtp-api
-# - Neon connection string from https://console.neon.tech
+# - Supabase keys from https://supabase.com (Project Settings → API)
 
 # 3. In Vercel, add environment variables:
-# DATABASE_URL
+# NEXT_PUBLIC_SUPABASE_URL
+# NEXT_PUBLIC_SUPABASE_ANON_KEY
+# SUPABASE_SERVICE_ROLE_KEY
 # BETTER_AUTH_SECRET
 # BETTER_AUTH_URL
 # OPENAI_API_KEY
@@ -539,7 +550,7 @@ pnpm db:push
 
 ## Contact & Support
 
-- **Database Issues:** https://neon.tech/docs
+- **Database Issues:** https://supabase.com/docs
 - **Deployment Issues:** https://vercel.com/docs
 - **Email Issues:** https://developers.brevo.com/docs
 - **AI API Issues:** https://platform.openai.com/docs
