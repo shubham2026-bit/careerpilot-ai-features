@@ -1,0 +1,237 @@
+================================================================================
+                    ENVIRONMENT VARIABLES - COPY & PASTE
+                        CareerPilot AI Production Setup
+================================================================================
+
+INSTRUCTIONS:
+1. Fill in each value below with your actual API keys and URLs
+2. Copy the entire block
+3. Go to Vercel → Project Settings → Environment Variables
+4. Paste all variables
+5. Deploy
+
+================================================================================
+                        REQUIRED VARIABLES (14)
+================================================================================
+
+SUPABASE DATABASE KEYS (Get from https://supabase.com → Project Settings → API)
+================================================================================
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+
+SUPABASE AUTH/REDIRECT (Development only - leave empty for production)
+================================================================================
+NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL=
+
+AUTHENTICATION (Generate with: openssl rand -base64 32)
+================================================================================
+BETTER_AUTH_SECRET=
+BETTER_AUTH_URL=https://careerpilot.com
+
+APPLICATION URLs
+================================================================================
+NEXT_PUBLIC_APP_URL=https://careerpilot.com
+
+EMAIL SERVICE - BREVO (Get from https://brevo.com → SMTP & API)
+================================================================================
+BREVO_API_KEY=
+EMAIL_FROM=noreply@careerpilot.com
+
+AI SERVICE - OPENAI (Get from https://platform.openai.com → API Keys)
+================================================================================
+OPENAI_API_KEY=
+
+CRON JOBS SECURITY (Generate with: openssl rand -base64 32)
+================================================================================
+CRON_SECRET=
+
+================================================================================
+                        OPTIONAL VARIABLES (4)
+================================================================================
+
+GITHUB OAUTH (Optional - Get from https://github.com/settings/developers)
+================================================================================
+GITHUB_OAUTH_CLIENT_ID=
+GITHUB_OAUTH_CLIENT_SECRET=
+
+LINKEDIN OAUTH (Optional - Get from https://linkedin.com/developers/apps)
+================================================================================
+LINKEDIN_OAUTH_CLIENT_ID=
+LINKEDIN_OAUTH_CLIENT_SECRET=
+
+ADMIN ACCESS (Optional - Comma-separated emails for admin features)
+================================================================================
+ADMIN_EMAILS=admin@careerpilot.com,support@careerpilot.com
+
+================================================================================
+                    STEP-BY-STEP SETUP INSTRUCTIONS
+================================================================================
+
+1. CREATE SUPABASE PROJECT
+   ├─ Go to https://supabase.com
+   ├─ Click "New Project"
+   ├─ Fill in project name, password, region
+   ├─ Wait for database to initialize (2-3 minutes)
+   ├─ Go to Settings → API
+   ├─ Copy:
+   │  ├─ Project URL → NEXT_PUBLIC_SUPABASE_URL
+   │  ├─ anon public key → NEXT_PUBLIC_SUPABASE_ANON_KEY
+   │  └─ service_role key → SUPABASE_SERVICE_ROLE_KEY
+   └─ (Save these 3 keys)
+
+2. GENERATE AUTHENTICATION SECRETS
+   ├─ Open Terminal and run:
+   │  ├─ openssl rand -base64 32  (copy output → BETTER_AUTH_SECRET)
+   │  └─ openssl rand -base64 32  (copy output → CRON_SECRET)
+   └─ (You now have 2 secrets)
+
+3. GET OPENAI API KEY
+   ├─ Go to https://platform.openai.com/account/api-keys
+   ├─ Click "Create new secret key"
+   ├─ Copy the key → OPENAI_API_KEY
+   └─ (Save this key)
+
+4. GET BREVO EMAIL KEY
+   ├─ Go to https://brevo.com
+   ├─ Sign up or login
+   ├─ Go to SMTP & API
+   ├─ Copy API Key → BREVO_API_KEY
+   ├─ Set EMAIL_FROM to your domain (e.g., noreply@yourdomain.com)
+   └─ (You now have email setup)
+
+5. GET GITHUB OAUTH (OPTIONAL)
+   ├─ Go to https://github.com/settings/developers
+   ├─ Click "New OAuth App"
+   ├─ Fill in application name
+   ├─ Authorization callback URL: https://yourdomain.com/api/auth/github/callback
+   ├─ Copy:
+   │  ├─ Client ID → GITHUB_OAUTH_CLIENT_ID
+   │  └─ Client Secret → GITHUB_OAUTH_CLIENT_SECRET
+   └─ (Optional - skip if not needed)
+
+6. GET LINKEDIN OAUTH (OPTIONAL)
+   ├─ Go to https://linkedin.com/developers/apps
+   ├─ Create new app
+   ├─ Authorized redirect URLs: https://yourdomain.com/api/auth/linkedin/callback
+   ├─ Copy:
+   │  ├─ Client ID → LINKEDIN_OAUTH_CLIENT_ID
+   │  └─ Client Secret → LINKEDIN_OAUTH_CLIENT_SECRET
+   └─ (Optional - skip if not needed)
+
+7. ADD TO VERCEL
+   ├─ Go to https://vercel.com/dashboard
+   ├─ Select your CareerPilot project
+   ├─ Settings → Environment Variables
+   ├─ Paste all variables above
+   └─ Deploy
+
+================================================================================
+                        QUICK REFERENCE TABLE
+================================================================================
+
+Variable                              | Required | Type   | Source
+--------------------------------------|----------|--------|---------------------------
+NEXT_PUBLIC_SUPABASE_URL              | YES      | URL    | Supabase Project Settings
+NEXT_PUBLIC_SUPABASE_ANON_KEY         | YES      | Secret | Supabase Project Settings
+SUPABASE_SERVICE_ROLE_KEY             | YES      | Secret | Supabase Project Settings
+NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL | NO       | URL    | Dev only (leave empty)
+BETTER_AUTH_SECRET                    | YES      | Secret | Generate: openssl rand -base64 32
+BETTER_AUTH_URL                       | YES      | URL    | Your domain URL
+NEXT_PUBLIC_APP_URL                   | YES      | URL    | Your domain URL
+BREVO_API_KEY                         | YES      | Secret | Brevo SMTP & API
+EMAIL_FROM                            | YES      | Email  | Your verified domain
+OPENAI_API_KEY                        | YES      | Secret | OpenAI API Keys
+CRON_SECRET                           | YES      | Secret | Generate: openssl rand -base64 32
+GITHUB_OAUTH_CLIENT_ID                | NO       | ID     | GitHub Settings
+GITHUB_OAUTH_CLIENT_SECRET            | NO       | Secret | GitHub Settings
+LINKEDIN_OAUTH_CLIENT_ID              | NO       | ID     | LinkedIn Apps
+LINKEDIN_OAUTH_CLIENT_SECRET          | NO       | Secret | LinkedIn Apps
+ADMIN_EMAILS                          | NO       | List   | Comma-separated emails
+
+================================================================================
+                            VERIFICATION
+================================================================================
+
+After adding all variables to Vercel, verify they're set:
+
+1. Go to Vercel → Project Settings → Environment Variables
+2. Look for all variables in the list
+3. Values should be partially hidden (security)
+4. Click "Deploy" to apply changes
+
+4. Test the application:
+   ├─ Go to your deployed URL
+   ├─ Try logging in
+   ├─ Check email verification (should send email via Brevo)
+   ├─ Try uploading a resume (should work)
+   └─ Check dashboard (should load without errors)
+
+================================================================================
+                            TROUBLESHOOTING
+================================================================================
+
+If something doesn't work:
+
+❌ Database errors → Check NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY
+❌ Login fails → Check BETTER_AUTH_SECRET and BETTER_AUTH_URL
+❌ Email not sending → Check BREVO_API_KEY and EMAIL_FROM
+❌ AI features fail → Check OPENAI_API_KEY
+❌ Cron jobs fail → Check CRON_SECRET
+❌ OAuth not working → Check GitHub/LinkedIn Client ID/Secret
+
+To debug in Vercel:
+1. Go to Deployments → select latest
+2. Check Function Logs
+3. Look for error messages
+4. Update env vars if needed
+5. Redeploy
+
+================================================================================
+                            SECURITY NOTES
+================================================================================
+
+⚠️  IMPORTANT:
+- Never commit .env files to Git
+- Never share API keys publicly
+- Rotate keys regularly
+- Use strong secrets (use openssl to generate)
+- Keep Supabase service role key SECRET (only on server)
+- Use anon key for CLIENT (NEXT_PUBLIC_ prefix)
+
+⚠️  BEFORE PRODUCTION:
+- Test all features with real credentials
+- Verify email domain in Brevo
+- Set up custom domain in Vercel
+- Enable SSL/HTTPS
+- Configure backups in Supabase
+- Set up monitoring/logging
+
+================================================================================
+                        When You Have All Values
+================================================================================
+
+Fill in the template below, then copy EVERYTHING to Vercel:
+
+---START COPY FROM HERE---
+
+NEXT_PUBLIC_SUPABASE_URL=<YOUR_SUPABASE_URL>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<YOUR_SUPABASE_ANON_KEY>
+SUPABASE_SERVICE_ROLE_KEY=<YOUR_SUPABASE_SERVICE_ROLE_KEY>
+NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL=
+BETTER_AUTH_SECRET=<YOUR_GENERATED_SECRET>
+BETTER_AUTH_URL=https://yourdomain.com
+NEXT_PUBLIC_APP_URL=https://yourdomain.com
+BREVO_API_KEY=<YOUR_BREVO_API_KEY>
+EMAIL_FROM=noreply@yourdomain.com
+OPENAI_API_KEY=<YOUR_OPENAI_API_KEY>
+CRON_SECRET=<YOUR_GENERATED_CRON_SECRET>
+GITHUB_OAUTH_CLIENT_ID=
+GITHUB_OAUTH_CLIENT_SECRET=
+LINKEDIN_OAUTH_CLIENT_ID=
+LINKEDIN_OAUTH_CLIENT_SECRET=
+ADMIN_EMAILS=
+
+---END COPY HERE---
+
+================================================================================

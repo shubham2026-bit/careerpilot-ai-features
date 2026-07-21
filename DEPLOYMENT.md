@@ -8,7 +8,7 @@ CareerPilot AI is a complete career intelligence platform ready for production d
 
 - Vercel account
 - Neon PostgreSQL database
-- Resend email API key
+- Brevo email API key (formerly Sendinblue)
 - GitHub account (for GitHub integration via OAuth)
 
 ## Quick Deploy to Vercel
@@ -44,9 +44,11 @@ BETTER_AUTH_SECRET=your_super_secret_key_generate_with_openssl
 BETTER_AUTH_URL=https://your-domain.vercel.app
 ```
 
-### Email
+### Email (Brevo - formerly Sendinblue)
 ```
-RESEND_API_KEY=re_your_resend_api_key
+# Use either BREVO_API_KEY or SENDINBLUE_API_TOKEN (both supported)
+BREVO_API_KEY=your_brevo_api_key_here
+EMAIL_FROM=noreply@your-domain.com
 NEXT_PUBLIC_APP_URL=https://your-domain.vercel.app
 ```
 
@@ -85,16 +87,17 @@ pnpm db:push
 
 ## Email Configuration
 
-### Resend Setup
+### Brevo Setup (Formerly Sendinblue)
 
-1. Sign up at [Resend](https://resend.com)
-2. Get API key from dashboard
-3. Add to Vercel environment variables
-4. For production, add and verify your domain
+1. Sign up at [Brevo](https://brevo.com)
+2. Go to SMTP & API section → Copy API Key
+3. Add to Vercel environment variables as `BREVO_API_KEY` or `SENDINBLUE_API_TOKEN`
+4. Set `EMAIL_FROM` to your sender email address
+5. For production, verify your sending domain in Brevo
 
 ### Email Templates
 
-Email templates are automatically processed. No additional setup needed.
+Email templates are automatically processed using React Email components. No additional setup needed.
 
 ## Domain Configuration
 
@@ -127,7 +130,9 @@ Automatically configured by Vercel - no action needed.
 | `DATABASE_URL` | Neon PostgreSQL connection | `postgresql://...` |
 | `BETTER_AUTH_SECRET` | Auth encryption key | Generated with openssl |
 | `BETTER_AUTH_URL` | App URL for auth redirects | `https://app.com` |
-| `RESEND_API_KEY` | Email service API key | `re_xxx...` |
+| `BREVO_API_KEY` | Brevo email API key (preferred) | From Brevo SMTP & API |
+| `SENDINBLUE_API_TOKEN` | Legacy Sendinblue token (also supported) | From Brevo SMTP & API |
+| `EMAIL_FROM` | Sender email address | `noreply@your-domain.com` |
 | `NEXT_PUBLIC_APP_URL` | Public app URL | `https://app.com` |
 
 ## Monitoring & Logs
@@ -144,7 +149,7 @@ Check Neon dashboard for query performance and errors.
 
 ### Email Logs
 
-Check Resend dashboard for email delivery status.
+Check Brevo dashboard (Transactional → Email Logs) for email delivery status.
 
 ## Performance Optimization
 
@@ -171,7 +176,7 @@ Check Resend dashboard for email delivery status.
 
 - **Database**: Upgrade Neon plan
 - **Compute**: Vercel Pro plan for higher limits
-- **Email**: Upgrade Resend plan
+- **Email**: Upgrade Brevo plan
 
 ### Load Testing
 
@@ -233,10 +238,10 @@ pnpm db:push --force
 
 ### Email Not Sending
 
-1. Verify RESEND_API_KEY
-2. Check user preferences
-3. Verify sender domain configured
-4. Check Resend dashboard logs
+1. Verify `BREVO_API_KEY` or `SENDINBLUE_API_TOKEN` is set
+2. Verify `EMAIL_FROM` is set to a valid email
+3. Check user preferences
+4. Check Brevo dashboard logs
 
 ### Auth Issues
 
@@ -279,7 +284,7 @@ Use Vercel Cron functions for:
 
 - [Vercel Docs](https://vercel.com/docs)
 - [Neon Docs](https://neon.tech/docs)
-- [Resend Docs](https://resend.com/docs)
+- [Brevo Docs](https://developers.brevo.com/docs)
 - [Next.js Docs](https://nextjs.org/docs)
 
 ## Deployment Checklist

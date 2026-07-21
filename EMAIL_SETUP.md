@@ -2,23 +2,25 @@
 
 ## Overview
 
-CareerPilot AI includes a comprehensive email notification system powered by Resend, enabling automated alerts for resume analysis, job matches, and weekly digests.
+CareerPilot AI includes a comprehensive email notification system powered by Brevo (formerly Sendinblue), enabling automated alerts for resume analysis, job matches, and weekly digests.
 
 ## Setup Instructions
 
-### 1. Get a Resend Account
+### 1. Get a Brevo Account
 
-1. Visit [https://resend.com](https://resend.com)
+1. Visit [https://brevo.com](https://brevo.com)
 2. Sign up for a free account
 3. Verify your email
-4. Go to the API Keys section and copy your API key
+4. Go to SMTP & API section and copy your API Key
 
-### 2. Add Environment Variable
+### 2. Add Environment Variables
 
-Add your Resend API key to your `.env.local` file:
+Add your Brevo API key to your `.env.local` file:
 
 ```bash
-RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# Use either BREVO_API_KEY or SENDINBLUE_API_TOKEN (both are supported)
+BREVO_API_KEY=your_brevo_api_key_here
+EMAIL_FROM=noreply@yourdomain.com
 ```
 
 Also ensure you have:
@@ -29,13 +31,13 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ### 3. Configure Sender Email (Production)
 
-When deploying to production, configure your sending domain in Resend:
+When deploying to production, configure your sending domain in Brevo:
 
-1. Go to Resend Dashboard → Domains
-2. Add your domain (e.g., `careerpilot.ai`)
-3. Update email sender in code to use your domain
+1. Go to Brevo Dashboard → SMTP & API → Senders
+2. Add and verify your domain (e.g., `careerpilot.ai`)
+3. Set `EMAIL_FROM` to your verified domain email
 
-For development, Resend provides a `noreply@resend.dev` default domain.
+For development, you can use any email format.
 
 ## Email Templates
 
