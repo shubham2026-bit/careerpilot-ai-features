@@ -1,0 +1,158 @@
+================================================================================
+                        API KEYS SETUP FORM
+================================================================================
+
+WHAT'S NEW:
+I've created an interactive form where you can paste your API keys and get
+environment variables ready to copy into Vercel.
+
+================================================================================
+                        HOW TO ACCESS THE FORM
+================================================================================
+
+1. Run your dev server:
+   pnpm dev
+
+2. Go to: http://localhost:3000/setup
+
+3. You'll see a beautiful form with all 12 fields
+
+================================================================================
+                        HOW TO USE THE FORM
+================================================================================
+
+Step 1: Gather Your API Keys
+----------------------------
+Go to these services and copy your actual keys:
+
+✓ SUPABASE (2 keys):
+  - Go to: https://supabase.com → Your Project → Settings → API
+  - Copy "anon public" key
+  - Copy "service_role secret" key
+
+✓ BREVO (1 key):
+  - Go to: https://app.brevo.com → SMTP & API
+  - Copy your API key
+
+✓ GITHUB (1 key):
+  - Go to: https://github.com/settings/developers → OAuth Apps
+  - Find your app → Copy "Client secret"
+
+✓ YOU ALREADY HAVE (2 keys):
+  - BETTER_AUTH_SECRET: fnyk+oc72HY7hcoor11ewFrdMXnfLh1+oyTilWk6f/U=
+  - CRON_SECRET: 9L2zC3wizQL4wq0OGcjM492pbJDKolT2D2YbENp67zM=
+
+✓ YOUR DOMAIN:
+  - BETTER_AUTH_URL: https://v0-careerpilott.vercel.app
+  - EMAIL_FROM: noreply@yourdomain.com
+
+Step 2: Fill in the Form
+------------------------
+1. Open http://localhost:3000/setup
+2. Paste each key into its field
+3. Watch the progress bar fill up
+4. When all required fields are done, it shows "Ready to deploy!"
+
+Step 3: Copy to Clipboard
+--------------------------
+1. Click the big "Copy to Clipboard" button
+2. It copies all your environment variables
+3. You'll see "Copied!" confirmation
+
+Step 4: Add to Vercel
+---------------------
+1. Go to: https://vercel.com → Your Project → Settings
+2. Find "Environment Variables" section
+3. Paste the copied content
+4. Vercel will split each line into KEY=VALUE pairs
+5. Click "Save"
+
+Step 5: Deploy
+--------------
+1. Redeploy your project: git push origin main
+2. Or use: vercel --prod
+3. Done! Your app is now live with all API keys configured
+
+================================================================================
+                        FORM FEATURES
+================================================================================
+
+✓ Real-time validation - Shows which keys are filled
+✓ Password fields - Your keys are hidden
+✓ Progress tracking - See what's filled and what's missing
+✓ Copy to clipboard - One-click copy for all variables
+✓ Helpful descriptions - Know exactly where to get each key
+✓ Optional fields - Non-critical fields are marked optional
+✓ Dark theme - Easy on the eyes
+
+================================================================================
+                        REQUIRED VS OPTIONAL
+================================================================================
+
+REQUIRED (8 fields - must fill):
+✓ NEXT_PUBLIC_SUPABASE_ANON_KEY
+✓ SUPABASE_SERVICE_ROLE_KEY
+✓ BREVO_API_KEY
+✓ GITHUB_OAUTH_CLIENT_SECRET
+✓ EMAIL_FROM
+✓ BETTER_AUTH_URL
+✓ BETTER_AUTH_SECRET
+✓ CRON_SECRET
+
+OPTIONAL (4 fields - can skip):
+○ GITHUB_OAUTH_CLIENT_ID
+○ LINKEDIN_OAUTH_CLIENT_ID
+○ LINKEDIN_OAUTH_CLIENT_SECRET
+○ GOOGLE_GENERATIVE_AI_API_KEY
+
+================================================================================
+                        EXAMPLE OUTPUT
+================================================================================
+
+When you fill all fields and click "Copy to Clipboard", you get:
+
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+BREVO_API_KEY=xkeysib-abc123def456...
+GITHUB_OAUTH_CLIENT_SECRET=ghp_abc123xyz789...
+EMAIL_FROM=noreply@yourdomain.com
+BETTER_AUTH_URL=https://v0-careerpilott.vercel.app
+BETTER_AUTH_SECRET=fnyk+oc72HY7hcoor11ewFrdMXnfLh1+oyTilWk6f/U=
+CRON_SECRET=9L2zC3wizQL4wq0OGcjM492pbJDKolT2D2YbENp67zM=
+
+Then paste this directly into Vercel Environment Variables!
+
+================================================================================
+                        TROUBLESHOOTING
+================================================================================
+
+Q: Form not showing?
+A: Make sure you ran "pnpm dev" and go to http://localhost:3000/setup
+
+Q: Keys not copying?
+A: Click the "Copy to Clipboard" button again or check browser console
+
+Q: Still says required fields missing?
+A: Make sure all 8 required fields (marked with red) have values
+
+Q: Keys showing in browser history?
+A: They won't - they're only in the form while you're using it, not in URL
+
+================================================================================
+                        READY TO START?
+================================================================================
+
+1. Run: pnpm dev
+2. Go to: http://localhost:3000/setup
+3. Gather your keys from services listed above
+4. Paste them into the form
+5. Click "Copy to Clipboard"
+6. Go to Vercel and paste
+7. Deploy!
+
+Questions? Check the documentation files in your project:
+- PRODUCTION_READINESS_CHECKLIST.md
+- SUPABASE_ONLY_SETUP.md
+- ENV_COPY_PASTE.txt
+
+================================================================================
