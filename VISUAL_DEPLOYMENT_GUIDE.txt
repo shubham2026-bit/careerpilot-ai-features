@@ -1,0 +1,212 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    CAREERPILOT AI - DEPLOYMENT FLOW                         ║
+║                         30 MINUTES TO PRODUCTION                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 1: DATABASE SETUP (8 MINUTES)                                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  1. Open Supabase Dashboard
+     └─> https://app.supabase.com/project/njoghcklnnskzlxklfrx
+
+  2. Create Tables (3 min)
+     └─> SQL Editor → New Query
+         └─> Copy: migrations/001_create_tables.sql
+             └─> Run ✓
+
+  3. Enable Security (3 min)
+     └─> SQL Editor → New Query
+         └─> Copy: migrations/002_setup_rls_policies.sql
+             └─> Run ✓
+
+  4. Verify Tables Exist
+     └─> Table Editor
+         └─> Should see: user_profiles, resumes, resume_analysis, etc.
+
+  Status: ✅ Database Ready
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 2: STORAGE SETUP (3 MINUTES)                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  1. Create Buckets
+     └─> Storage → Create New Bucket
+         ├─> resumes (private)
+         ├─> portfolio-images (public)
+         └─> profile-pictures (public)
+
+  2. Configure Policies
+     └─> See: SUPABASE_STORAGE_SETUP.md
+         └─> Copy RLS policies for each bucket
+
+  3. Verify Buckets
+     └─> Storage → Should see 3 buckets
+
+  Status: ✅ Storage Ready
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 3: ENVIRONMENT SETUP (5 MINUTES)                                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  1. Copy Template
+     └─> Terminal: cp .env.example .env.development.local
+
+  2. Get Your API Keys
+     ├─> Supabase
+     │   └─> https://app.supabase.com → Settings → API
+     │       └─> Copy Anon Key & Service Role Key
+     │
+     ├─> Brevo
+     │   └─> https://app.brevo.com/settings/users/api
+     │       └─> Copy API Key
+     │
+     └─> Google AI
+         └─> https://makersuite.google.com/app/apikey
+             └─> Copy API Key
+
+  3. Generate Secret
+     └─> Terminal: openssl rand -base64 32
+         └─> Copy output to BETTER_AUTH_SECRET
+
+  4. Fill .env.development.local
+     ├─> NEXT_PUBLIC_SUPABASE_URL = from Supabase
+     ├─> NEXT_PUBLIC_SUPABASE_ANON_KEY = from Supabase
+     ├─> SUPABASE_SERVICE_ROLE_KEY = from Supabase
+     ├─> BREVO_API_KEY = from Brevo
+     ├─> GOOGLE_GENERATIVE_AI_API_KEY = from Google
+     └─> BETTER_AUTH_SECRET = generated secret
+
+  Status: ✅ Environment Ready
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 4: LOCAL TESTING (5 MINUTES)                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  1. Install Dependencies
+     └─> Terminal: pnpm install
+
+  2. Start Dev Server
+     └─> Terminal: pnpm dev
+         └─> Visit: http://localhost:3000
+
+  3. Test Signup
+     └─> Click "Sign Up"
+         └─> Create test account with email
+             └─> Check email (should get welcome from Brevo)
+
+  4. Test Resume Upload
+     └─> Go to Dashboard
+         └─> Upload a test PDF/DOCX file
+             └─> Check: Supabase Storage → resumes bucket
+
+  5. Check Console
+     └─> Browser DevTools Console
+         └─> Should see NO red errors
+
+  Status: ✅ Local Testing Complete
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 5: PRODUCTION DEPLOYMENT (2 MINUTES)                                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  1. Add Vercel Environment Variables
+     └─> https://vercel.com/dashboard
+         └─> Select: careerpilot-ai-features
+             └─> Settings → Environment Variables
+                 ├─> NEXT_PUBLIC_SUPABASE_URL
+                 ├─> NEXT_PUBLIC_SUPABASE_ANON_KEY
+                 ├─> SUPABASE_SERVICE_ROLE_KEY
+                 ├─> BREVO_API_KEY
+                 ├─> GOOGLE_GENERATIVE_AI_API_KEY
+                 ├─> BETTER_AUTH_SECRET
+                 └─> NEXT_PUBLIC_APP_URL
+
+  2. Deploy
+     └─> Terminal: git push origin main
+         └─> Vercel auto-deploys (2-3 minutes)
+             └─> Check Vercel dashboard for status
+
+  3. Verify Production
+     └─> Visit: https://v0-careerpilot.vercel.app
+         └─> Test signup and features
+             └─> Check email delivery
+                 └─> Monitor Vercel logs for errors
+
+  Status: ✅ LIVE ON PRODUCTION!
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ QUICK REFERENCE                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Commands:
+  pnpm install          Install dependencies
+  pnpm dev              Run locally
+  pnpm build            Build for production
+  openssl rand -b 32    Generate secret
+
+Links:
+  Supabase:    https://app.supabase.com
+  Vercel:      https://vercel.com/dashboard
+  Brevo:       https://app.brevo.com
+  Google AI:   https://makersuite.google.com
+
+Files:
+  Database:    migrations/001_create_tables.sql
+  Security:    migrations/002_setup_rls_policies.sql
+  Template:    .env.example
+  Storage:     SUPABASE_STORAGE_SETUP.md
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ TROUBLESHOOTING                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Problem                    Solution
+─────────────────────────────────────────────────────────────────────────────
+"Cannot find module"       Run: pnpm install
+"Build failed"             Check TypeScript: pnpm exec tsc --noEmit
+"Connection refused"       Check env variables in .env.development.local
+"Email not sending"        Check BREVO_API_KEY in Vercel
+"Resume won't upload"      Check storage bucket exists and RLS configured
+"No data showing"          Ensure RLS policies created in Supabase
+"OAuth not working"        Get OAuth keys and add to Vercel env vars
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SUCCESS CHECKLIST                                                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Before declaring success:
+
+  ✓ Tables created in Supabase
+  ✓ RLS policies enabled
+  ✓ Storage buckets created
+  ✓ .env.development.local filled
+  ✓ pnpm dev runs without errors
+  ✓ Can sign up with email
+  ✓ Welcome email received
+  ✓ Can upload resume
+  ✓ Dashboard loads
+  ✓ Environment variables added to Vercel
+  ✓ git push origin main successful
+  ✓ Production URL loads
+  ✓ Production signup works
+
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                                                                            ║
+║  YOU'RE READY! Follow the steps above and you'll be live in 30 minutes.   ║
+║                                                                            ║
+║  Start with: START_HERE.md                                                 ║
+║  Questions? Check: SUPABASE_COMPLETE_SETUP.md                              ║
+║  Need help? See: DEPLOYMENT_STEPS.md                                       ║
+║                                                                            ║
+║                          LET'S DEPLOY! 🚀                                   ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
