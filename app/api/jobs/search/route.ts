@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateText } from 'ai'
 import { createServerSupabase } from '@/lib/supabase/server'
 import { db } from '@/lib/db'
 import { userAnalytics } from '@/lib/db/schema'
@@ -33,63 +32,33 @@ export async function POST(request: NextRequest) {
       limit = 10,
     } = params
 
-    // Use AI to generate relevant job search results
-    const prompt = `You are a job search assistant. Generate realistic job listings based on the following criteria:
-- Job Title: ${title}
-- Location: ${location}
-- Experience Level: ${experience}
-- Job Type: ${jobType}
-- Number of jobs: ${limit}
-
-Generate ${limit} job listings in JSON format. Each job should have:
-{
-  "id": "unique_id",
-  "title": "job_title",
-  "company": "company_name",
-  "location": "location",
-  "salary_min": number,
-  "salary_max": number,
-  "jobType": "${jobType}",
-  "description": "job description",
-  "requirements": ["requirement1", "requirement2"],
-  "nice_to_haves": ["skill1", "skill2"],
-  "posted_date": "date",
-  "url": "link_to_job"
-}
-
-Return a valid JSON array with ${limit} jobs.`
-
-    const { text: jobsText } = await generateText({
-      model: 'gpt-4o-mini',
-      prompt,
-      temperature: 0.8,
-    })
-
-    // Parse jobs from AI response
-    let jobs = []
-    try {
-      const jsonMatch = jobsText.match(/\[[\s\S]*\]/)
-      if (jsonMatch) {
-        jobs = JSON.parse(jsonMatch[0])
-      }
-    } catch (parseError) {
-      console.error('[v0] Failed to parse jobs:', parseError)
-      // Generate mock jobs as fallback
-      jobs = Array.from({ length: limit }, (_, i) => ({
-        id: `job_${uuidv4()}`,
-        title,
-        company: `Company ${i + 1}`,
-        location,
-        salary_min: 80000 + i * 5000,
-        salary_max: 120000 + i * 5000,
-        jobType,
-        description: `Exciting opportunity for ${title}`,
-        requirements: ['JavaScript', 'React', 'Node.js'],
-        nice_to_haves: ['TypeScript', 'AWS'],
-        posted_date: new Date().toISOString(),
-        url: '#',
-      }))
-    }
+    // PRODUCTION NOTICE: This endpoint generates AI-simulated jobs for demonstration.
+    // In production, integrate with real job APIs (Indeed, LinkedIn Jobs, or similar)
+    // to fetch actual job listings.
+    
+    // Example integration points:
+    // 1. Indeed API - https://opensource.indeedeng.io/api-documentation/
+    // 2. LinkedIn Jobs API - requires enterprise partnership
+    // 3. RemoteOK API - https://remoteok.io/api
+    // 4. JustJoinIt API - https://justjoinit.pl/api
+    
+    console.warn('[v0] Job search using simulated data. Configure real job API for production.')
+    
+    // For now, generate demonstration jobs
+    const jobs = Array.from({ length: limit }, (_, i) => ({
+      id: `job_${uuidv4()}`,
+      title,
+      company: `Company ${i + 1}`,
+      location,
+      salary_min: 80000 + i * 5000,
+      salary_max: 120000 + i * 5000,
+      jobType,
+      description: `This is a demonstration job listing. In production, configure a real job API integration.`,
+      requirements: ['JavaScript', 'React', 'Node.js'],
+      nice_to_haves: ['TypeScript', 'AWS'],
+      posted_date: new Date().toISOString(),
+      url: '#',
+    }))
 
     // Track search in analytics
     try {
