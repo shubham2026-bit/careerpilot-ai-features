@@ -65,51 +65,43 @@ export async function GET(request: NextRequest) {
     const [existingProfile] = await db
       .select()
       .from(linkedinProfiles)
-      .where(eq(linkedinProfiles.user_id, user.id))
+      .where(eq(linkedinProfiles.userId, user.id))
       .limit(1)
-
-    // Get profile picture
-    const pictureResponse = await fetch(
-      'https://api.linkedin.com/v2/me?projection=(id,profilePicture(displayImage))',
-      {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Accept': 'application/json',
-        },
-      }
-    )
-
-    let profilePicture = null
-    if (pictureResponse.ok) {
-      const pictureData = await pictureResponse.json()
-      profilePicture = pictureData.profilePicture?.displayImage
-    }
 
     if (existingProfile) {
       // Update existing profile
       await db
         .update(linkedinProfiles)
         .set({
-          linkedin_id: linkedinUser.id,
-          profile_url: `https://www.linkedin.com/in/${linkedinUser.id}`,
-          profile_picture: profilePicture,
-          access_token: accessToken,
-          last_synced: new Date(),
-          updated_at: new Date(),
+          profileUrl: `https://www.linkedin.com/in/${linkedinUser.id}`,
+          profileImageUrl: linkedinUser.profilePicture?.displayImage,
+          fullName: linkedinUser.localizedFirstName && linkedinUser.localizedLastName 
+            ? `${linkedinUser.localizedFirstName} ${linkedinUser.localizedLastName}` 
+            : undefined,
+          updatedAt: new Date(),
         })
-        .where(eq(linkedinProfiles.user_id, user.id))
+        .where(eq(linkedinProfiles.userId, user.id))
     } else {
       // Create new profile
       await db.insert(linkedinProfiles).values({
         id: uuidv4(),
-        user_id: user.id,
-        linkedin_id: linkedinUser.id,
-        profile_url: `https://www.linkedin.com/in/${linkedinUser.id}`,
-        profile_picture: profilePicture,
-        access_token: accessToken,
-        last_synced: new Date(),
-        created_at: new Date(),
-        updated_at: new Date(),
+        userId: user.id,
+        profileUrl: `https://www.linkedin.com/in/${linkedinUser.id}`,
+        fullName: linkedinUser.localizedFirstName && linkedinUser.localizedLastName 
+          ? `${linkedinUser.localizedFirstName} ${linkedinUser.localizedLastName}` 
+          : 'LinkedIn User',
+        profileImageUrl: linkedinUser.profilePicture?.displayImage,
+        headline: '',
+        location: '',
+        about: '',
+        connections: 0,
+        endorsements: 0,
+        skills: [],
+        experience: [],
+        education: [],
+        certifications: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
       })
     }
 

@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
     const [existingProfile] = await db
       .select()
       .from(githubProfiles)
-      .where(eq(githubProfiles.user_id, user.id))
+      .where(eq(githubProfiles.userId, user.id))
       .limit(1)
 
     if (existingProfile) {
@@ -73,36 +73,33 @@ export async function GET(request: NextRequest) {
       await db
         .update(githubProfiles)
         .set({
-          github_id: githubUser.id,
           username: githubUser.login,
-          profile_url: githubUser.html_url,
-          avatar_url: githubUser.avatar_url,
+          profileUrl: githubUser.html_url,
+          avatarUrl: githubUser.avatar_url,
           bio: githubUser.bio,
-          public_repos: githubUser.public_repos,
+          publicRepos: githubUser.public_repos,
           followers: githubUser.followers,
           following: githubUser.following,
-          access_token: accessToken,
-          last_synced: new Date(),
-          updated_at: new Date(),
+          updatedAt: new Date(),
         })
-        .where(eq(githubProfiles.user_id, user.id))
+        .where(eq(githubProfiles.userId, user.id))
     } else {
       // Create new profile
       await db.insert(githubProfiles).values({
         id: uuidv4(),
-        user_id: user.id,
-        github_id: githubUser.id,
+        userId: user.id,
         username: githubUser.login,
-        profile_url: githubUser.html_url,
-        avatar_url: githubUser.avatar_url,
+        profileUrl: githubUser.html_url,
+        name: githubUser.name,
         bio: githubUser.bio || '',
-        public_repos: githubUser.public_repos,
+        avatarUrl: githubUser.avatar_url,
+        publicRepos: githubUser.public_repos,
         followers: githubUser.followers,
         following: githubUser.following,
-        access_token: accessToken,
-        last_synced: new Date(),
-        created_at: new Date(),
-        updated_at: new Date(),
+        topLanguages: [],
+        recentProjects: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
       })
     }
 
