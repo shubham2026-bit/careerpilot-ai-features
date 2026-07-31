@@ -95,13 +95,14 @@ export async function sendJobMatchEmail(
   jobUrl: string
 ) {
   try {
-    const session = await auth.api.getSession()
-    if (!session?.user) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
       throw new Error('Unauthorized')
     }
 
-    const userId = session.user.id
-    const userEmail = session.user.email
+    const userId = user.id
+    const userEmail = user.email
 
     if (!userEmail) {
       throw new Error('User email not found')
@@ -171,13 +172,14 @@ export async function sendWeeklyDigestEmail(data: {
   careerTipContent: string
 }) {
   try {
-    const session = await auth.api.getSession()
-    if (!session?.user) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
       throw new Error('Unauthorized')
     }
 
-    const userId = session.user.id
-    const userEmail = session.user.email
+    const userId = user.id
+    const userEmail = user.email
 
     if (!userEmail) {
       throw new Error('User email not found')

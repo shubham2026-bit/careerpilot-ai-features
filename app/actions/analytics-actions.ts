@@ -25,22 +25,23 @@ export async function initializeUserAnalytics() {
   
   if (existing.length > 0) return existing[0]
   
-  return db
+  const result = await db
     .insert(userAnalytics)
     .values({
       id: uuidv4(),
       userId,
       totalResumeUploads: 0,
       totalProfileViews: 0,
-      averageResumeScore: '0',
-      careerGrowthScore: '0',
-      jobMatchPercentage: '0',
-      skillGaps: JSON.stringify([]),
-      topSkills: JSON.stringify([]),
+      averageResumeScore: 0,
+      careerGrowthScore: 0,
+      jobMatchPercentage: 0,
+      skillGaps: [],
+      topSkills: [],
       activityLog: [],
     })
     .returning()
-    .then((r) => r[0])
+  
+  return result[0]
 }
 
 export async function updateAnalytics(data: Partial<{

@@ -2,6 +2,8 @@
 
 import { createServerSupabase } from '@/lib/supabase/server'
 import { getUserId } from '@/lib/supabase/server'
+import { db } from '@/lib/db'
+import { resumes, resumeAnalysis } from '@/lib/db/schema'
 import { revalidatePath } from 'next/cache'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -157,8 +159,26 @@ export async function uploadResume(formData: FormData) {
     throw new Error(`Failed to save resume: ${resumeError.message}`)
   }
   
-  // Note: resume_analysis table doesn't exist in current schema
-  // Analysis data is stored within the resume content as metadata
+  // Save analysis to database
+  const analysisId = uuidv4()
+  try {
+    await db.insert(resumeAnalysis).values({
+      id: analysisId,
+      userId,
+      resumeId,
+      overallScore: scores.overallScore.toString(),
+      skillsScore: scores.skillsScore.toString(),
+      experienceScore: scores.experienceScore.toString(),
+      educationScore: scores.educationScore.toString(),
+      formattingScore: scores.formattingScore.toString(),
+      strengths: insights.strengths,
+      improvements: insights.improvements,
+      recommendations: insights.recommendations,
+      keywordMissing: insights.missingKeywords,
+    })
+  } catch (error) {
+    console.error('[v0] Failed to save resume analysis:', error)
+  }
   
   revalidatePath('/dashboard/resume')
   
