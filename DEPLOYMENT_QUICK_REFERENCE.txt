@@ -1,0 +1,159 @@
+================================================================================
+                   CAREERPILOT AI - QUICK REFERENCE CARD
+                        20 MINUTES TO PRODUCTION
+================================================================================
+
+PHASE 1: DATABASE SETUP (10 min)
+────────────────────────────────────────────────────────────────────────────
+
+Step 1.1: Open Supabase
+  URL: https://app.supabase.com/project/njoghcklnnskzlxklfrx
+  Login with your credentials
+
+Step 1.2: Create Tables (5 min)
+  1. Click: SQL Editor
+  2. Click: New Query
+  3. Copy file: migrations/001_create_tables.sql
+  4. Paste into editor
+  5. Click: Run
+  ✓ Wait for "Success" message
+
+Step 1.3: Enable Security (3 min)
+  1. Click: New Query
+  2. Copy file: migrations/002_setup_rls_policies.sql
+  3. Paste into editor
+  4. Click: Run
+  ✓ Wait for "Success" message
+
+Step 1.4: Create Storage (2 min)
+  1. Click: Storage
+  2. Create 3 buckets (all Public):
+     • resumes
+     • portfolio-images
+     • profile-pictures
+  ✓ All 3 buckets visible
+
+
+PHASE 2: LOCAL TESTING (5 min)
+────────────────────────────────────────────────────────────────────────────
+
+Step 2.1: Install (2 min)
+  $ pnpm install
+  ✓ See checkmark at end
+
+Step 2.2: Start (1 min)
+  $ pnpm dev
+  ✓ See "ready on http://localhost:3000"
+
+Step 2.3: Test (2 min)
+  1. Open: http://localhost:3000
+  2. Click: Sign Up
+  3. Enter: email, password
+  4. Click: Sign Up
+  ✓ See dashboard
+
+Step 2.4: Verify Email (1 min)
+  1. Check inbox
+  2. Look for: "Welcome to CareerPilot AI"
+  3. Click link in email
+  ✓ Email verified
+
+
+PHASE 3: DEPLOY (3 min)
+────────────────────────────────────────────────────────────────────────────
+
+Step 3.1: Stop Local Server (1 min)
+  Press: Ctrl+C in terminal
+  ✓ Server stops
+
+Step 3.2: Push to GitHub (2 min)
+  $ git add .
+  $ git commit -m "Deploy CareerPilot AI - Production ready"
+  $ git push origin main
+  ✓ Code pushed
+
+Step 3.3: Wait for Deployment (2-3 min AUTO)
+  1. Visit: https://vercel.com/dashboard
+  2. Click: Your project
+  3. Watch: Deployment builds
+  ✓ See green checkmark
+
+
+FINAL VERIFICATION
+────────────────────────────────────────────────────────────────────────────
+
+Check these boxes:
+  ☐ Supabase: 15 tables created
+  ☐ Supabase: 3 storage buckets
+  ☐ Local: pnpm dev works
+  ☐ Local: Signup works
+  ☐ Local: Email received
+  ☐ GitHub: Code pushed
+  ☐ Vercel: Green checkmark
+  ☐ Production: App loads
+
+
+QUICK COMMANDS
+────────────────────────────────────────────────────────────────────────────
+
+Local Development:
+  pnpm install        Install dependencies
+  pnpm dev           Run development server
+  pnpm build         Build for production
+
+Git Commands:
+  git add .          Stage all changes
+  git commit -m "msg" Commit changes
+  git push origin main Push to GitHub
+
+Stop Server:
+  Ctrl+C             Press in terminal
+
+
+LINKS
+────────────────────────────────────────────────────────────────────────────
+
+Supabase:     https://app.supabase.com/project/njoghcklnnskzlxklfrx
+Vercel:       https://vercel.com/dashboard
+Local App:    http://localhost:3000
+Production:   https://v0-careerpilot.vercel.app
+
+
+TROUBLESHOOTING
+────────────────────────────────────────────────────────────────────────────
+
+Database error?          → Check both migrations ran in Supabase
+Email not sending?       → Check BREVO_API_KEY in Vercel settings
+Build fails?             → Run: pnpm build (check local errors)
+App doesn't load?        → Wait 1-2 min, clear browser cache
+Can't see buckets?       → Refresh Supabase, ensure Public is ON
+
+
+TIMING
+────────────────────────────────────────────────────────────────────────────
+
+Phase 1 (Database):   10 minutes
+Phase 2 (Testing):     5 minutes
+Phase 3 (Deploy):      3 minutes
+────────────────────
+TOTAL:                18 minutes ✓
+
+
+SUCCESS MEANS
+────────────────────────────────────────────────────────────────────────────
+
+✓ App is live at: https://v0-careerpilot.vercel.app
+✓ Users can sign up
+✓ Email notifications work
+✓ Resume upload works
+✓ Dashboard works
+✓ All features functional
+
+
+START HERE: STEP_BY_STEP_DEPLOYMENT.md
+
+This file shows exactly what to do at each step with detailed instructions.
+
+================================================================================
+                         YOU'RE READY TO DEPLOY! 🚀
+================================================================================
